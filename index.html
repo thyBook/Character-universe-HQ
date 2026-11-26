@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101522">
 <title>Character Universe HQ</title>
+
 <style>
 :root{
  --bg:#0c111b;--panel:#151d2b;--panel2:#1b2637;
@@ -110,12 +111,55 @@ select option{background:#172233;color:white}
 .map-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .relationship-line{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .relationship-line:last-child{border-bottom:0}
+
+/* ACCOUNT SCREEN */
+#authScreen{min-height:100vh;display:none;align-items:center;justify-content:center;padding:20px}
+.auth-card{width:min(460px,100%);background:linear-gradient(145deg,#192638,#111a28);border:1px solid #45536a;border-radius:18px;padding:28px;box-shadow:var(--shadow)}
+.auth-card h1{font-size:34px;margin:8px 0}
+.auth-card p{color:var(--muted);font-size:13px}
+.auth-card .form-field{margin:15px 0}
+.auth-card .btn{width:100%;margin-top:10px}
+.auth-message{padding:11px;border-radius:9px;background:#202c3e;border:1px solid var(--line);margin-top:14px;font-size:13px;display:none}
+.auth-message.error{border-color:#a45c5c;color:#ffb4b4}
+.auth-message.success{border-color:#557f73;color:#a9e4d0}
+.account-line{font-size:11px;color:var(--muted);margin-top:12px;overflow-wrap:anywhere}
+.sync-status{font-size:11px;color:var(--teal);padding:8px 10px;border:1px solid var(--line);border-radius:9px}
+.sync-status.error{color:#ffaaaa}
 @media(max-width:950px){.shell{grid-template-columns:1fr}aside{position:relative;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--line)}.brand{padding:2px 5px 10px}.nav-label,.side-note{display:none}nav{display:flex;overflow:auto;gap:4px;padding-bottom:3px}nav button{white-space:nowrap;width:auto;padding:9px 11px;font-size:12px}nav .ico{width:auto}.map-layout{grid-template-columns:1fr}}
 @media(max-width:600px){.topbar{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr);gap:9px}.stat{padding:13px}.stat strong{font-size:27px}.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}.actions{width:100%}.actions .btn{flex:1}}
 </style>
 </head>
+
 <body>
-<div class="shell">
+
+<!-- SIGN IN / CREATE ACCOUNT -->
+<div id="authScreen">
+ <div class="auth-card">
+  <div class="sigil">✧</div>
+  <div class="eyebrow">Your private creative archive</div>
+  <h1>Character Universe HQ</h1>
+  <p>Sign in to access your worlds, characters and timelines from your devices.</p>
+
+  <form id="authForm">
+   <div class="form-field">
+    <label for="authEmail">Email address</label>
+    <input class="field" id="authEmail" type="email" autocomplete="email" required>
+   </div>
+   <div class="form-field">
+    <label for="authPassword">Password</label>
+    <input class="field" id="authPassword" type="password" autocomplete="current-password" minlength="6" required>
+   </div>
+   <button class="btn primary" id="authSubmit" type="submit">Sign in</button>
+  </form>
+
+  <button class="btn" id="switchAuth" type="button">Create a new account</button>
+  <button class="btn" id="resetPassword" type="button">Forgot password?</button>
+  <div class="auth-message" id="authMessage"></div>
+  <div class="account-line">Your archive is private to your account. Do not share your password with anyone.</div>
+ </div>
+</div>
+
+<div class="shell" id="appShell" style="display:none">
 <aside>
  <div class="brand"><div class="sigil">✧</div><div><strong>CHARACTER UNIVERSE HQ</strong><small>Worldbuilding archive</small></div></div>
  <nav id="nav">
@@ -133,40 +177,98 @@ select option{background:#172233;color:white}
   <div class="nav-label">Your archive</div>
   <button data-page="backup"><span class="ico">▤</span>Backup & settings</button>
  </nav>
- <div class="side-note">A private-feeling workspace for building worlds, keeping secrets straight and connecting every detail.</div>
+ <div class="side-note">A private workspace for building worlds, keeping secrets straight and connecting every detail.</div>
 </aside>
+
 <main>
  <div class="topbar">
-  <div><div class="eyebrow" id="eyebrow">Your creative archive</div><h1 id="pageTitle">Welcome back.</h1><p class="subtitle" id="pageSub">Every universe begins somewhere. This is yours.</p></div>
-  <div class="actions" id="topActions"><button class="btn" onclick="exportData()">↓ Export backup</button><button class="btn primary" onclick="openCreate()">＋ Add entry</button></div>
+  <div>
+   <div class="eyebrow" id="eyebrow">Your creative archive</div>
+   <h1 id="pageTitle">Welcome back.</h1>
+   <p class="subtitle" id="pageSub">Every universe begins somewhere. This is yours.</p>
+  </div>
+  <div class="actions" id="topActions">
+   <span class="sync-status" id="syncStatus">☁ Connected</span>
+   <button class="btn" onclick="exportData()">↓ Export backup</button>
+   <button class="btn" onclick="signOut()">Sign out</button>
+   <button class="btn primary" onclick="openCreate()">＋ Add entry</button>
+  </div>
  </div>
+ <div class="account-line" id="accountEmail"></div>
  <div id="content"></div>
- <div class="notice">LOCAL STORAGE VERSION · Entries are saved in this browser on this device. Export backups regularly. Cloud accounts and Supabase syncing are not connected in this file.</div>
+ <div class="notice">CLOUD ARCHIVE · Your entries are saved to your private Supabase account. Export a backup occasionally as an extra precaution.</div>
 </main>
 </div>
 
-<div class="modal-wrap" id="modalWrap"><div class="modal">
- <div class="modal-head"><h2 id="modalTitle">New entry</h2><button class="btn small" onclick="closeModal()">✕ Close</button></div>
- <form id="entryForm"><div class="form-grid" id="formFields"></div><div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit">Save entry</button></div></form>
-</div></div>
+<div class="modal-wrap" id="modalWrap">
+ <div class="modal">
+  <div class="modal-head">
+   <h2 id="modalTitle">New entry</h2>
+   <button class="btn small" onclick="closeModal()">✕ Close</button>
+  </div>
+  <form id="entryForm">
+   <div class="form-grid" id="formFields"></div>
+   <div class="modal-actions">
+    <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn primary" type="submit">Save entry</button>
+   </div>
+  </form>
+ </div>
+</div>
+
 <input type="file" id="importFile" accept="application/json" hidden>
+
+<!-- Supabase library -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 'use strict';
 
+/* =========================================================
+   SUPABASE CONNECTION
+   These are your public Project URL and publishable key.
+   Never put a service_role or secret key in this website.
+========================================================= */
+
+const SUPABASE_URL='https://gxqywwapwefdexumxcnk.supabase.co';
+const SUPABASE_KEY='sb_publishable_UJRdvNNZguI2HYBRI8BvzA_g5h_AK1j';
+
+const supabaseClient=window.supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY
+);
+
+/* =========================================================
+   LOCAL DATA AND APP STATE
+========================================================= */
+
 const KEY='characterUniverseHQ_v1';
-const blank={characters:[],universes:[],locations:[],relationships:[],groups:[],events:[],links:[]};
+
+const blank={
+ characters:[],
+ universes:[],
+ locations:[],
+ relationships:[],
+ groups:[],
+ events:[],
+ links:[]
+};
 
 function freshBlank(){
  return Object.fromEntries(Object.keys(blank).map(k=>[k,[]]));
 }
+
 function load(){
  try{
   const stored=JSON.parse(localStorage.getItem(KEY)||'{}');
   const result={...freshBlank(),...stored};
-  Object.keys(blank).forEach(k=>{if(!Array.isArray(result[k]))result[k]=[]});
+  Object.keys(blank).forEach(k=>{
+   if(!Array.isArray(result[k]))result[k]=[];
+  });
   return result;
- }catch(e){return freshBlank()}
+ }catch(e){
+  return freshBlank();
+ }
 }
 
 let db=load();
@@ -175,45 +277,478 @@ let editing=null;
 let selectedTreeUniverse='all';
 let selectedLocation=null;
 
+let currentUser=null;
+let cloudReady=false;
+let cloudRowIds={};
+let cloudKnownIds={};
+let syncQueue=Promise.resolve();
+let authMode='signin';
+
 function id(){
  return 'e'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 }
+
 function esc(s=''){
- return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ return String(s).replace(/[&<>"']/g,c=>({
+  '&':'&amp;',
+  '<':'&lt;',
+  '>':'&gt;',
+  '"':'&quot;',
+  "'":'&#39;'
+ }[c]));
 }
+
 function characterName(i){
  return db.characters.find(c=>c.id===i)?.name||i||'Unknown';
 }
+
 function universeNames(){
- return [...new Set([...db.universes.map(u=>u.name),...db.characters.map(c=>c.universe),...db.locations.map(l=>l.universe),...db.groups.map(g=>g.universe),...db.events.map(e=>e.universe)].filter(Boolean))];
+ return [...new Set([
+  ...db.universes.map(u=>u.name),
+  ...db.characters.map(c=>c.universe),
+  ...db.locations.map(l=>l.universe),
+  ...db.groups.map(g=>g.universe),
+  ...db.events.map(e=>e.universe)
+ ].filter(Boolean))];
 }
+
 function locationName(i){
  return db.locations.find(l=>l.id===i)?.name||i||'';
 }
+
+function setSyncStatus(message,isError=false){
+ const el=document.getElementById('syncStatus');
+ if(!el)return;
+ el.textContent=message;
+ el.classList.toggle('error',isError);
+}
+
+/* =========================================================
+   AUTHENTICATION
+========================================================= */
+
+function showAuthMessage(message,type=''){
+ const el=document.getElementById('authMessage');
+ el.textContent=message;
+ el.className='auth-message '+type;
+ el.style.display='block';
+}
+
+function clearAuthMessage(){
+ const el=document.getElementById('authMessage');
+ el.textContent='';
+ el.style.display='none';
+}
+
+function showAuth(){
+ document.getElementById('authScreen').style.display='flex';
+ document.getElementById('appShell').style.display='none';
+}
+
+function showApp(){
+ document.getElementById('authScreen').style.display='none';
+ document.getElementById('appShell').style.display='grid';
+ document.getElementById('accountEmail').textContent=
+  currentUser?.email?'Signed in as '+currentUser.email:'';
+}
+
+document.getElementById('switchAuth').addEventListener('click',()=>{
+ authMode=authMode==='signin'?'signup':'signin';
+ document.getElementById('authSubmit').textContent=
+  authMode==='signin'?'Sign in':'Create account';
+ document.getElementById('switchAuth').textContent=
+  authMode==='signin'?'Create a new account':'Back to sign in';
+ document.getElementById('authPassword').autocomplete=
+  authMode==='signin'?'current-password':'new-password';
+ clearAuthMessage();
+});
+
+document.getElementById('authForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ clearAuthMessage();
+
+ const email=document.getElementById('authEmail').value.trim();
+ const password=document.getElementById('authPassword').value;
+ const submit=document.getElementById('authSubmit');
+
+ submit.disabled=true;
+ submit.textContent='Please wait...';
+
+ try{
+  if(authMode==='signup'){
+   const {data,error}=await supabaseClient.auth.signUp({
+    email,
+    password
+   });
+
+   if(error)throw error;
+
+   if(data.session){
+    await startUserSession(data.session.user);
+   }else{
+    showAuthMessage(
+     'Your account has been created. Check your email for a confirmation link. Once confirmed, return here and sign in.',
+     'success'
+    );
+   }
+  }else{
+   const {data,error}=await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+   });
+
+   if(error)throw error;
+   await startUserSession(data.user);
+  }
+ }catch(error){
+  showAuthMessage(error.message||'Something went wrong. Please try again.','error');
+ }finally{
+  submit.disabled=false;
+  submit.textContent=authMode==='signin'?'Sign in':'Create account';
+ }
+});
+
+document.getElementById('resetPassword').addEventListener('click',async()=>{
+ const email=document.getElementById('authEmail').value.trim();
+
+ if(!email){
+  showAuthMessage('Enter your email address first, then choose Forgot password.','error');
+  return;
+ }
+
+ try{
+  const {error}=await supabaseClient.auth.resetPasswordForEmail(email);
+  if(error)throw error;
+  showAuthMessage('If the address is registered, a password reset email will be sent.','success');
+ }catch(error){
+  showAuthMessage(error.message||'Could not request a password reset.','error');
+ }
+});
+
+async function signOut(){
+ if(!confirm('Sign out of Character Universe HQ?'))return;
+
+ try{
+  await supabaseClient.auth.signOut();
+ }catch(error){
+  alert('There was a problem signing out: '+error.message);
+ }
+}
+
+supabaseClient.auth.onAuthStateChange((event,session)=>{
+ if(event==='SIGNED_OUT'){
+  currentUser=null;
+  cloudReady=false;
+  showAuth();
+ }
+});
+
+async function startUserSession(user){
+ currentUser=user;
+ setSyncStatus('☁ Loading archive...');
+ showApp();
+
+ try{
+  await loadCloudData();
+  cloudReady=true;
+  render();
+  setSyncStatus('☁ Cloud synced');
+ }catch(error){
+  cloudReady=false;
+  setSyncStatus('Cloud error',true);
+  alert(
+   'Your account is signed in, but the cloud archive could not be loaded.\n\n'+
+   error.message+
+   '\n\nCheck that your archive_entries table and its permissions are set up correctly.'
+  );
+ }
+}
+
+/* =========================================================
+   CLOUD DATABASE
+   Table: public.archive_entries
+
+   Expected columns:
+   id, user_id, kind, data, created_at, updated_at, entry_key
+
+   RLS policies should restrict rows to auth.uid() = user_id.
+========================================================= */
+
+function hasLocalEntries(data){
+ return Object.keys(blank).some(k=>(data[k]||[]).length>0);
+}
+
+function mergeArchives(local,remote){
+ const merged=freshBlank();
+
+ Object.keys(blank).forEach(kind=>{
+  const map=new Map();
+
+  (remote[kind]||[]).forEach(item=>map.set(item.id,item));
+  (local[kind]||[]).forEach(item=>map.set(item.id,item));
+
+  merged[kind]=Array.from(map.values());
+ });
+
+ return merged;
+}
+
+async function loadCloudData(){
+ const {data:rows,error}=await supabaseClient
+  .from('archive_entries')
+  .select('id,user_id,kind,entry_key,data,created_at,updated_at');
+
+ if(error)throw error;
+
+ const remote=freshBlank();
+ cloudRowIds={};
+ cloudKnownIds={};
+
+ Object.keys(blank).forEach(k=>{
+  cloudRowIds[k]={};
+  cloudKnownIds[k]=[];
+ });
+
+ (rows||[]).forEach(row=>{
+  if(!blank[row.kind]||!row.data)return;
+
+  const item={
+   ...row.data,
+   id:row.entry_key||row.data.id
+  };
+
+  remote[row.kind].push(item);
+  cloudRowIds[row.kind][item.id]=row.id;
+  cloudKnownIds[row.kind].push(item.id);
+ });
+
+ const local=load();
+ const localHasData=hasLocalEntries(local);
+ const remoteHasData=hasLocalEntries(remote);
+
+ if(localHasData){
+  db=mergeArchives(local,remote);
+
+  if(remoteHasData){
+   setSyncStatus('☁ Merging archives...');
+  }else{
+   setSyncStatus('☁ Moving browser entries to cloud...');
+  }
+ }else{
+  db=remote;
+ }
+
+ localStorage.setItem(KEY,JSON.stringify(db));
+
+ await syncCloud();
+
+ if(localHasData&&remoteHasData){
+  console.info('Existing browser entries and cloud entries were merged.');
+ }else if(localHasData&&!remoteHasData){
+  console.info('Existing browser entries were copied to the cloud archive.');
+ }
+}
+
+async function syncCloud(){
+ if(!currentUser||!cloudReady)return;
+
+ syncQueue=syncQueue.then(async()=>{
+  const snapshot=JSON.parse(JSON.stringify(db));
+
+  for(const kind of Object.keys(blank)){
+   const entries=snapshot[kind]||[];
+   const currentIds=entries.map(x=>String(x.id));
+
+   // Remove cloud records that have been deleted locally.
+   const oldIds=cloudKnownIds[kind]||[];
+
+   for(const oldId of oldIds){
+    if(!currentIds.includes(String(oldId))){
+     const {error}=await supabaseClient
+      .from('archive_entries')
+      .delete()
+      .eq('user_id',currentUser.id)
+      .eq('kind',kind)
+      .eq('entry_key',String(oldId));
+
+     if(error)throw error;
+     delete cloudRowIds[kind][oldId];
+    }
+   }
+
+   // Save all current records.
+   for(const item of entries){
+    const entryId=String(item.id);
+
+    const row={
+     id:cloudRowIds[kind][entryId]||crypto.randomUUID(),
+     user_id:currentUser.id,
+     kind,
+     entry_key:entryId,
+     data:item,
+     updated_at:new Date().toISOString()
+    };
+
+    const {error}=await supabaseClient
+     .from('archive_entries')
+     .upsert(row,{
+      onConflict:'user_id,kind,entry_key'
+     });
+
+    if(error)throw error;
+
+    cloudRowIds[kind][entryId]=row.id;
+   }
+
+   cloudKnownIds[kind]=currentIds;
+  }
+
+  setSyncStatus('☁ Cloud synced');
+ }).catch(error=>{
+  setSyncStatus('Sync failed',true);
+  console.error('Cloud sync error:',error);
+  throw error;
+ });
+
+ return syncQueue;
+}
+
+/* =========================================================
+   SAVE
+========================================================= */
+
 function save(){
  try{
   localStorage.setItem(KEY,JSON.stringify(db));
   render();
+
+  if(cloudReady){
+   setSyncStatus('☁ Saving...');
+   syncCloud().catch(error=>{
+    console.error(error);
+    setSyncStatus('Sync failed',true);
+   });
+  }
  }catch(e){
-  alert('Your browser could not save this change. You may need to free up browser storage or export a backup.');
+  alert('Your browser could not save this change. Export a backup and check your browser storage.');
  }
 }
 
+/* =========================================================
+   ENTRY CONFIGURATION
+========================================================= */
+
 const configs={
-characters:{title:'Characters',sub:'The people who make your universes breathe.',singular:'character',fields:[
- ['name','Full name','text',true],['age','Current age','text'],['birthDate','Birth date','date'],['deathDate','Death date','date'],['pronouns','Pronouns','text'],['universe','Universe','universe-name'],['species','Species','text'],['portrait','Portrait image URL','url'],['appearance','Appearance','textarea'],['personality','Personality','textarea'],['backstory','Backstory','textarea'],['secrets','Secrets / notes','textarea']]},
-universes:{title:'Universes',sub:'Keep each world and its rules in one place.',singular:'universe',fields:[
- ['name','Universe name','text',true],['genre','Genre','text'],['foundedDate','Creation / founding date','date'],['description','Description','textarea'],['mainWorld','Main world','text'],['notes','Rules / extra notes','textarea']]},
-locations:{title:'World Atlas',sub:'An interactive map of your worlds, cities and important places.',singular:'location',fields:[
- ['name','Place name','text',true],['type','Location type','select',['World','Planet','Country','Kingdom','Region','City','District','Village','Building','Landmark','Ruins','Hideout','Other']],['universe','Universe','universe-name'],['parent','Part of / parent location','text'],['establishedDate','Built / founded date','date'],['latitude','Map vertical position (0–100)','number'],['longitude','Map horizontal position (0–100)','number'],['image','Image URL','url'],['government','Government','text'],['culture','Culture / language','text'],['population','Population','text'],['description','Description','textarea'],['history','History','textarea']]},
-relationships:{title:'Relationships',sub:'Connect existing characters and record how they know each other.',singular:'connection',fields:[
- ['characterA','First character','character',true],['characterB','Second character','character',true],['type','Relationship type','select',['Parent','Child','Sibling','Grandparent','Grandchild','Aunt / uncle','Niece / nephew','Cousin','Adoptive parent','Adopted child','Other family','Partner','Spouse','Ex-partner','Friend','Best friend','Acquaintance','Rival','Enemy','Colleague','Mentor','Other']],['startDate','Relationship began','date'],['endDate','Relationship ended','date'],['status','Current status','text'],['howMet','How they met','textarea'],['history','Relationship history','textarea'],['notes','Extra notes','textarea']]},
-groups:{title:'Groups & factions',sub:'Organisations, teams, societies and secretive institutions.',singular:'group',fields:[
- ['name','Group name','text',true],['type','Group type','text'],['foundedDate','Founded date','date'],['leader','Leader','text'],['headquarters','Headquarters','text'],['universe','Universe','universe-name'],['purpose','Purpose','textarea'],['history','History','textarea'],['members','Members','textarea']]},
-events:{title:'Timeline',sub:'A chronological history of events across your worlds.',singular:'event',fields:[
- ['name','Event name','text',true],['date','Event date','date',true],['universe','Universe','universe-name'],['location','Location','location'],['characters','Characters involved','multi-character'],['description','What happened','textarea'],['consequences','Consequences','textarea']]},
-links:{title:'Link Library',sub:'Keep research, references and inspiration separate from your lore.',singular:'link',fields:[
- ['name','Link title','text',true],['url','URL','url',true],['category','Category','text'],['savedDate','Date saved / relevant date','date'],['notes','Why you saved it','textarea']]}
+ characters:{
+  title:'Characters',
+  sub:'The people who make your universes breathe.',
+  singular:'character',
+  fields:[
+   ['name','Full name','text',true],
+   ['age','Current age','text'],
+   ['birthDate','Birth date','date'],
+   ['deathDate','Death date','date'],
+   ['pronouns','Pronouns','text'],
+   ['universe','Universe','universe-name'],
+   ['species','Species','text'],
+   ['portrait','Portrait image URL','url'],
+   ['appearance','Appearance','textarea'],
+   ['personality','Personality','textarea'],
+   ['backstory','Backstory','textarea'],
+   ['secrets','Secrets / notes','textarea']
+  ]
+ },
+ universes:{
+  title:'Universes',
+  sub:'Keep each world and its rules in one place.',
+  singular:'universe',
+  fields:[
+   ['name','Universe name','text',true],
+   ['genre','Genre','text'],
+   ['foundedDate','Creation / founding date','date'],
+   ['description','Description','textarea'],
+   ['mainWorld','Main world','text'],
+   ['notes','Rules / extra notes','textarea']
+  ]
+ },
+ locations:{
+  title:'World Atlas',
+  sub:'An interactive map of your worlds, cities and important places.',
+  singular:'location',
+  fields:[
+   ['name','Place name','text',true],
+   ['type','Location type','select',['World','Planet','Country','Kingdom','Region','City','District','Village','Building','Landmark','Ruins','Hideout','Other']],
+   ['universe','Universe','universe-name'],
+   ['parent','Part of / parent location','text'],
+   ['establishedDate','Built / founded date','date'],
+   ['latitude','Map vertical position (0–100)','number'],
+   ['longitude','Map horizontal position (0–100)','number'],
+   ['image','Image URL','url'],
+   ['government','Government','text'],
+   ['culture','Culture / language','text'],
+   ['population','Population','text'],
+   ['description','Description','textarea'],
+   ['history','History','textarea']
+  ]
+ },
+ relationships:{
+  title:'Relationships',
+  sub:'Connect existing characters and record how they know each other.',
+  singular:'connection',
+  fields:[
+   ['characterA','First character','character',true],
+   ['characterB','Second character','character',true],
+   ['type','Relationship type','select',['Parent','Child','Sibling','Grandparent','Grandchild','Aunt / uncle','Niece / nephew','Cousin','Adoptive parent','Adopted child','Other family','Partner','Spouse','Ex-partner','Friend','Best friend','Acquaintance','Rival','Enemy','Colleague','Mentor','Other']],
+   ['startDate','Relationship began','date'],
+   ['endDate','Relationship ended','date'],
+   ['status','Current status','text'],
+   ['howMet','How they met','textarea'],
+   ['history','Relationship history','textarea'],
+   ['notes','Extra notes','textarea']
+  ]
+ },
+ groups:{
+  title:'Groups & factions',
+  sub:'Organisations, teams, societies and secretive institutions.',
+  singular:'group',
+  fields:[
+   ['name','Group name','text',true],
+   ['type','Group type','text'],
+   ['foundedDate','Founded date','date'],
+   ['leader','Leader','text'],
+   ['headquarters','Headquarters','text'],
+   ['universe','Universe','universe-name'],
+   ['purpose','Purpose','textarea'],
+   ['history','History','textarea'],
+   ['members','Members','textarea']
+  ]
+ },
+ events:{
+  title:'Timeline',
+  sub:'A chronological history of events across your worlds.',
+  singular:'event',
+  fields:[
+   ['name','Event name','text',true],
+   ['date','Event date','date',true],
+   ['universe','Universe','universe-name'],
+   ['location','Location','location'],
+   ['characters','Characters involved','multi-character'],
+   ['description','What happened','textarea'],
+   ['consequences','Consequences','textarea']
+  ]
+ },
+ links:{
+  title:'Link Library',
+  sub:'Keep research, references and inspiration separate from your lore.',
+  singular:'link',
+  fields:[
+   ['name','Link title','text',true],
+   ['url','URL','url',true],
+   ['category','Category','text'],
+   ['savedDate','Date saved / relevant date','date'],
+   ['notes','Why you saved it','textarea']
+  ]
+ }
 };
 
 const pageTitles={
@@ -223,12 +758,19 @@ const pageTitles={
  backup:['Your archive','Keep a portable copy of everything you create.']
 };
 
+/* =========================================================
+   NAVIGATION AND RENDERING
+========================================================= */
+
 function setPage(p){
  if(!configs[p]&&!pageTitles[p])return;
  page=p;
- document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));
+ document.querySelectorAll('nav button').forEach(b=>{
+  b.classList.toggle('active',b.dataset.page===p);
+ });
  render();
 }
+
 document.getElementById('nav').addEventListener('click',e=>{
  const b=e.target.closest('button[data-page]');
  if(b)setPage(b.dataset.page);
@@ -237,13 +779,19 @@ document.getElementById('nav').addEventListener('click',e=>{
 function counts(){
  return Object.fromEntries(Object.keys(blank).map(k=>[k,db[k].length]));
 }
+
 function render(){
  const c=configs[page];
  const title=pageTitles[page]||[c.title,c.sub];
+
  document.getElementById('pageTitle').textContent=title[0];
  document.getElementById('pageSub').textContent=title[1];
- document.getElementById('eyebrow').textContent=page==='dashboard'?'Your creative archive':page==='backup'?'Archive tools':'Character Universe HQ';
- document.getElementById('topActions').style.display=page==='backup'?'none':'flex';
+ document.getElementById('eyebrow').textContent=
+  page==='dashboard'?'Your creative archive':
+  page==='backup'?'Archive tools':'Character Universe HQ';
+
+ document.getElementById('topActions').style.display=
+  page==='backup'?'none':'flex';
 
  if(page==='dashboard')dashboard();
  else if(page==='backup')backup();
@@ -253,9 +801,14 @@ function render(){
  else if(c)listPage(page);
 }
 
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
 function dashboard(){
  const n=counts();
  const total=Object.values(n).reduce((a,b)=>a+b,0);
+
  document.getElementById('content').innerHTML=`
  <div class="stats">
   <div class="stat"><span>♙ Characters</span><strong>${n.characters}</strong></div>
@@ -263,59 +816,108 @@ function dashboard(){
   <div class="stat"><span>◷ Timeline entries</span><strong>${timelineItems().length}</strong></div>
   <div class="stat"><span>↗ Saved links</span><strong>${n.links}</strong></div>
  </div>
- <div class="section-head"><h2>Recently added</h2><span class="muted">${total} total entries</span></div>
+ <div class="section-head">
+  <h2>Recently added</h2>
+  <span class="muted">${total} total entries</span>
+ </div>
  <div class="grid">${recentCards()}</div>
  <div class="section-head"><h2>Your archive, your rules</h2></div>
  <div class="grid">
  ${[
- ['01 · People','Character dossiers','Build detailed profiles and keep track of every important person.','characters'],
- ['02 · Connections','Family tree','See how characters connect through family and relationships.','familytree'],
- ['03 · History','Living timeline','Every dated entry appears in chronological order.','timeline'],
- ['04 · Geography','World Atlas','Explore your worlds through an interactive map.','locations']
- ].map(x=>`<div class="card"><span class="tag">${x[0]}</span><h3>${x[1]}</h3><p>${x[2]}</p><button class="btn small" onclick="setPage('${x[3]}')">Open →</button></div>`).join('')}
+  ['01 · People','Character dossiers','Build detailed profiles and keep track of every important person.','characters'],
+  ['02 · Connections','Family tree','See how characters connect through family and relationships.','familytree'],
+  ['03 · History','Living timeline','Every dated entry appears in chronological order.','timeline'],
+  ['04 · Geography','World Atlas','Explore your worlds through an interactive map.','locations']
+ ].map(x=>`
+  <div class="card">
+   <span class="tag">${x[0]}</span>
+   <h3>${x[1]}</h3>
+   <p>${x[2]}</p>
+   <button class="btn small" onclick="setPage('${x[3]}')">Open →</button>
+  </div>
+ `).join('')}
  </div>`;
 }
 
 function recentCards(){
  let all=[];
- Object.keys(configs).forEach(k=>db[k].forEach(x=>all.push({...x,_kind:k})));
+
+ Object.keys(configs).forEach(k=>{
+  db[k].forEach(x=>all.push({...x,_kind:k}));
+ });
+
  all.sort((a,b)=>(b.updated||b.created||0)-(a.updated||a.created||0));
- if(!all.length)return '<div class="empty">Your archive is waiting for its first entry.</div>';
+
+ if(!all.length){
+  return '<div class="empty">Your archive is waiting for its first entry.</div>';
+ }
+
  return all.slice(0,3).map(x=>`
- <div class="card">
-  <span class="tag">${configs[x._kind].singular}</span>
-  <h3>${esc(x.name||characterName(x.characterA)+' & '+characterName(x.characterB))}</h3>
-  <p>${esc(x.description||x.personality||x.date||x.type||'Added to your archive')}</p>
-  <div class="card-foot"><span class="muted">Recently added</span><button class="btn small" onclick="setPage('${x._kind}')">View →</button></div>
- </div>`).join('');
+  <div class="card">
+   <span class="tag">${configs[x._kind].singular}</span>
+   <h3>${esc(x.name||characterName(x.characterA)+' & '+characterName(x.characterB))}</h3>
+   <p>${esc(x.description||x.personality||x.date||x.type||'Added to your archive')}</p>
+   <div class="card-foot">
+    <span class="muted">Recently added</span>
+    <button class="btn small" onclick="setPage('${x._kind}')">View →</button>
+   </div>
+  </div>
+ `).join('');
 }
 
+/* =========================================================
+   CATEGORY LISTS AND CARDS
+========================================================= */
+
 function listPage(k){
- const c=configs[k],arr=db[k]||[];
+ const c=configs[k];
+ const arr=db[k]||[];
+
  document.getElementById('content').innerHTML=`
  <div class="toolbar">
   <input class="field search" id="search" placeholder="Search ${c.title.toLowerCase()}..." oninput="filterCards()">
   <button class="btn primary" onclick="openCreate('${k}')">＋ Add ${c.singular}</button>
  </div>
- <div class="grid" id="cards">${arr.length?arr.map(x=>card(k,x)).join(''):`<div class="empty">Nothing here yet. Add your first ${c.singular} to begin.</div>`}</div>`;
+ <div class="grid" id="cards">
+  ${arr.length?arr.map(x=>card(k,x)).join(''):`<div class="empty">Nothing here yet. Add your first ${c.singular} to begin.</div>`}
+ </div>`;
 }
 
 function card(k,x){
  const title=x.name||(characterName(x.characterA)+' & '+characterName(x.characterB));
+
  let summary=x.description||x.personality||x.purpose||x.howMet||x.notes||x.backstory||x.date||'No description added yet.';
- const meta=k==='events'?x.date:k==='characters'?[x.age&&'Age '+x.age,x.pronouns,x.universe].filter(Boolean).join(' · '):k==='relationships'?x.type:k==='links'?x.category:x.type||x.universe||'';
- const link=k==='links'&&x.url?`<a class="link" href="${esc(x.url)}" target="_blank" rel="noopener">Open reference ↗</a>`:'';
- if(k==='relationships')summary=characterName(x.characterA)+' and '+characterName(x.characterB)+'. '+(x.howMet||'');
+
+ const meta=k==='events'?x.date:
+  k==='characters'?[x.age&&'Age '+x.age,x.pronouns,x.universe].filter(Boolean).join(' · '):
+  k==='relationships'?x.type:
+  k==='links'?x.category:
+  x.type||x.universe||'';
+
+ const link=k==='links'&&x.url?
+  `<a class="link" href="${esc(x.url)}" target="_blank" rel="noopener">Open reference ↗</a>`:'';
+
+ if(k==='relationships'){
+  summary=characterName(x.characterA)+' and '+characterName(x.characterB)+'. '+(x.howMet||'');
+ }
+
  if(k==='events')summary=x.description||'No description added yet.';
+
  return `
  <article class="card" data-search="${esc(JSON.stringify(x).toLowerCase())}">
-  <div class="card-top"><span class="tag">${esc(meta||configs[k].singular)}</span>${x.portrait?`<img class="portrait" src="${esc(x.portrait)}" alt="">`:'<span class="muted">✧</span>'}</div>
+  <div class="card-top">
+   <span class="tag">${esc(meta||configs[k].singular)}</span>
+   ${x.portrait?`<img class="portrait" src="${esc(x.portrait)}" alt="">`:'<span class="muted">✧</span>'}
+  </div>
   <h3>${esc(title)}</h3>
   <p>${esc(summary).slice(0,190)}${summary.length>190?'…':''}</p>
   ${link}
   <div class="card-foot">
    <span class="muted">${esc(x.universe||x.location||x.status||'Archive entry')}</span>
-   <span><button class="btn small" onclick="editEntry('${k}','${x.id}')">Edit</button> <button class="btn small danger" onclick="deleteEntry('${k}','${x.id}')">Delete</button></span>
+   <span>
+    <button class="btn small" onclick="editEntry('${k}','${x.id}')">Edit</button>
+    <button class="btn small danger" onclick="deleteEntry('${k}','${x.id}')">Delete</button>
+   </span>
   </div>
  </article>`;
 }
@@ -323,79 +925,154 @@ function card(k,x){
 function filterCards(){
  const input=document.getElementById('search');
  if(!input)return;
+
  const q=input.value.toLowerCase();
- document.querySelectorAll('#cards article').forEach(el=>el.style.display=el.dataset.search.includes(q)?'':'none');
+
+ document.querySelectorAll('#cards article').forEach(el=>{
+  el.style.display=el.dataset.search.includes(q)?'':'none';
+ });
 }
+
+/* =========================================================
+   CREATE AND EDIT FORMS
+========================================================= */
 
 function openCreate(k=page){
  if(!configs[k])k='characters';
  editing={kind:k,id:null};
  showForm(k,{});
 }
+
 function editEntry(k,i){
  const x=db[k]?.find(y=>y.id===i);
- if(x){editing={kind:k,id:i};showForm(k,x)}
+ if(x){
+  editing={kind:k,id:i};
+  showForm(k,x);
+ }
 }
+
 function showForm(k,x){
  const c=configs[k];
- document.getElementById('modalTitle').textContent=(editing.id?'Edit ':'Add ')+c.singular;
+
+ document.getElementById('modalTitle').textContent=
+  (editing.id?'Edit ':'Add ')+c.singular;
+
  document.getElementById('formFields').innerHTML=c.fields.map(f=>{
   const [key,label,type,extra]=f;
   const val=x[key]??'';
   let inp='';
-  if(type==='textarea')inp=`<textarea name="${key}" ${extra===true?'required':''}>${esc(val)}</textarea>`;
-  else if(type==='character')inp=`<select name="${key}" required><option value="">Choose a character</option>${db.characters.map(ch=>`<option value="${esc(ch.id)}" ${val===ch.id?'selected':''}>${esc(ch.name)}</option>`).join('')}</select>`;
+
+  if(type==='textarea'){
+   inp=`<textarea name="${key}" ${extra===true?'required':''}>${esc(val)}</textarea>`;
+  }
+  else if(type==='character'){
+   inp=`<select name="${key}" required>
+    <option value="">Choose a character</option>
+    ${db.characters.map(ch=>`
+     <option value="${esc(ch.id)}" ${val===ch.id?'selected':''}>${esc(ch.name)}</option>
+    `).join('')}
+   </select>`;
+  }
   else if(type==='multi-character'){
    const selected=Array.isArray(val)?val:[];
-   inp=`<select name="${key}" multiple style="min-height:125px">${db.characters.map(ch=>`<option value="${esc(ch.id)}" ${selected.includes(ch.id)?'selected':''}>${esc(ch.name)}</option>`).join('')}</select><small class="muted">Hold Ctrl or Command to select multiple characters.</small>`;
+   inp=`<select name="${key}" multiple style="min-height:125px">
+    ${db.characters.map(ch=>`
+     <option value="${esc(ch.id)}" ${selected.includes(ch.id)?'selected':''}>${esc(ch.name)}</option>
+    `).join('')}
+   </select>
+   <small class="muted">Hold Ctrl or Command to select multiple characters.</small>`;
   }
-  else if(type==='location')inp=`<select name="${key}"><option value="">Choose a location</option>${db.locations.map(l=>`<option value="${esc(l.id)}" ${val===l.id?'selected':''}>${esc(l.name)}</option>`).join('')}</select>`;
-  else if(type==='universe-name')inp=`<input class="field" name="${key}" list="universeOptions" value="${esc(val)}" placeholder="Enter or choose a universe"><datalist id="universeOptions">${universeNames().map(u=>`<option value="${esc(u)}">`).join('')}</datalist>`;
-  else if(type==='select')inp=`<select name="${key}">${extra.map(v=>`<option value="${esc(v)}" ${val===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`;
-  else inp=`<input class="field" type="${type}" name="${key}" value="${esc(val)}" ${extra===true?'required':''}>`;
-  return `<div class="form-field ${['textarea','multi-character'].includes(type)?'full':''}"><label>${label}${extra===true?' *':''}</label>${inp}</div>`;
+  else if(type==='location'){
+   inp=`<select name="${key}">
+    <option value="">Choose a location</option>
+    ${db.locations.map(l=>`
+     <option value="${esc(l.id)}" ${val===l.id?'selected':''}>${esc(l.name)}</option>
+    `).join('')}
+   </select>`;
+  }
+  else if(type==='universe-name'){
+   inp=`<input class="field" name="${key}" list="universeOptions" value="${esc(val)}" placeholder="Enter or choose a universe">
+   <datalist id="universeOptions">
+    ${universeNames().map(u=>`<option value="${esc(u)}">`).join('')}
+   </datalist>`;
+  }
+  else if(type==='select'){
+   inp=`<select name="${key}">
+    ${extra.map(v=>`<option value="${esc(v)}" ${val===v?'selected':''}>${esc(v)}</option>`).join('')}
+   </select>`;
+  }
+  else{
+   inp=`<input class="field" type="${type}" name="${key}" value="${esc(val)}" ${extra===true?'required':''}>`;
+  }
+
+  return `
+   <div class="form-field ${['textarea','multi-character'].includes(type)?'full':''}">
+    <label>${label}${extra===true?' *':''}</label>
+    ${inp}
+   </div>`;
  }).join('');
+
  document.getElementById('modalWrap').classList.add('open');
 }
+
 function closeModal(){
  document.getElementById('modalWrap').classList.remove('open');
  editing=null;
 }
+
 document.getElementById('entryForm').addEventListener('submit',e=>{
  e.preventDefault();
  if(!editing)return;
+
  const k=editing.kind;
  const fd=new FormData(e.target);
  const obj=Object.fromEntries(fd.entries());
+
  if(k==='events')obj.characters=fd.getAll('characters');
  if(k==='characters'&&obj.age==='')obj.age='';
+
  obj.id=editing.id||id();
+
  const existing=db[k].find(x=>x.id===editing.id);
+
  obj.created=existing?.created||Date.now();
  obj.updated=Date.now();
+
  const idx=db[k].findIndex(x=>x.id===obj.id);
+
  if(idx>=0)db[k][idx]=obj;
  else db[k].unshift(obj);
+
  closeModal();
  save();
 });
 
-/* DELETE CONTROLS FOR ALL CATEGORIES */
+/* =========================================================
+   DELETE ENTRIES
+========================================================= */
+
 function deleteEntry(k,i){
  const item=db[k]?.find(x=>x.id===i);
  if(!item)return;
+
  const name=item.name||characterName(item.characterA)+' & '+characterName(item.characterB);
+
  if(!confirm(`Delete "${name}"? This cannot be undone.`))return;
 
  db[k]=db[k].filter(x=>x.id!==i);
 
  if(k==='characters'){
   db.relationships=db.relationships.filter(r=>r.characterA!==i&&r.characterB!==i);
-  db.events=db.events.map(ev=>({...ev,characters:(ev.characters||[]).filter(cid=>cid!==i)}));
+  db.events=db.events.map(ev=>({
+   ...ev,
+   characters:(ev.characters||[]).filter(cid=>cid!==i)
+  }));
   if(selectedLocation===i)selectedLocation=null;
  }
+
  if(k==='universes'){
   const universeName=item.name;
+
   if(universeName){
    db.characters=db.characters.map(x=>x.universe===universeName?{...x,universe:''}:x);
    db.locations=db.locations.map(x=>x.universe===universeName?{...x,universe:''}:x);
@@ -403,19 +1080,26 @@ function deleteEntry(k,i){
    db.events=db.events.map(x=>x.universe===universeName?{...x,universe:''}:x);
   }
  }
+
  if(k==='locations'){
   db.events=db.events.map(ev=>ev.location===i?{...ev,location:''}:ev);
   if(selectedLocation===i)selectedLocation=null;
  }
+
  save();
 }
 
-/* UNIVERSAL TIMELINE */
+/* =========================================================
+   UNIVERSAL TIMELINE
+========================================================= */
+
 function timelineItems(){
  const items=[];
+
  function add(kind,arr,dateField,label,descriptionField){
   arr.forEach(x=>{
    if(!x[dateField])return;
+
    items.push({
     id:x.id,
     kind,
@@ -445,6 +1129,7 @@ function timelineItems(){
 function timelinePage(){
  const events=timelineItems();
  const kinds=[...new Set(events.map(e=>e.kind))];
+
  document.getElementById('content').innerHTML=`
  <div class="timeline-controls">
   <input class="field search" id="timelineSearch" placeholder="Search the entire timeline..." oninput="filterTimeline()">
@@ -454,12 +1139,14 @@ function timelinePage(){
   </select>
   <button class="btn primary" onclick="openCreate('events')">＋ Add timeline event</button>
  </div>
+
  <div class="card">
   <span class="tag">Living chronology</span>
   <h3>Your universe's history</h3>
   <p>Every date attached to a character, universe, location, relationship, group, event or saved link appears here automatically. Add or edit a date in its original entry to update this timeline.</p>
   <div class="muted"><strong>${events.length}</strong> dated entries</div>
  </div>
+
  <div class="timeline" id="timelineEvents">
   ${events.length?events.map(ev=>`
    <div class="event" data-kind="${esc(ev.kind)}" data-search="${esc((ev.name+' '+ev.description+' '+ev.universe+' '+ev.kind).toLowerCase())}">
@@ -471,7 +1158,8 @@ function timelinePage(){
      <button class="btn small" onclick="openTimelineSource('${ev.kind}','${ev.id}')">Edit source</button>
      <button class="btn small danger" onclick="removeTimelineDate('${ev.kind}','${ev.id}','${ev.field}')">Remove date</button>
     </p>
-   </div>`).join(''):`<div class="empty">No dated entries yet. Add dates to existing entries or create your first event.</div>`}
+   </div>
+  `).join(''):`<div class="empty">No dated entries yet. Add dates to existing entries or create your first event.</div>`}
  </div>`;
 }
 
@@ -487,61 +1175,101 @@ function sourceCollection(kind){
   'Event':'events',
   'Reference saved':'links'
  };
+
  return map[kind];
 }
+
 function openTimelineSource(kind,i){
  const k=sourceCollection(kind);
  if(k)editEntry(k,i);
 }
+
 function removeTimelineDate(kind,i,field){
  const k=sourceCollection(kind);
  if(!k)return;
+
  const item=db[k].find(x=>x.id===i);
  if(!item)return;
+
  if(!confirm(`Remove this date from "${item.name||'this entry'}"? The original entry will remain in your archive.`))return;
+
  item[field]='';
  item.updated=Date.now();
  save();
 }
+
 function filterTimeline(){
  const input=document.getElementById('timelineSearch');
  const select=document.getElementById('timelineKind');
+
  if(!input||!select)return;
+
  const q=input.value.toLowerCase();
  const kind=select.value;
+
  document.querySelectorAll('#timelineEvents .event').forEach(el=>{
   el.style.display=el.dataset.search.includes(q)&&(!kind||el.dataset.kind===kind)?'':'none';
  });
 }
 
-/* FAMILY TREE */
+/* =========================================================
+   FAMILY TREE
+========================================================= */
+
 function isFamily(type=''){
  const t=type.toLowerCase();
- return ['parent','child','sibling','grandparent','grandchild','aunt','uncle','niece','nephew','cousin','adoptive','adopted','other family'].some(x=>t.includes(x));
+
+ return [
+  'parent','child','sibling','grandparent','grandchild',
+  'aunt','uncle','niece','nephew','cousin','adoptive',
+  'adopted','other family'
+ ].some(x=>t.includes(x));
 }
+
 function isAdoption(type=''){
  return type.toLowerCase().includes('adopt');
 }
+
 function relationshipColor(type=''){
  if(isFamily(type))return '#111111';
+
  const t=type.toLowerCase();
+
  if(t.includes('friend'))return '#398de0';
  if(t.includes('partner')||t.includes('spouse')||t.includes('romantic'))return '#df82a6';
  if(t.includes('rival')||t.includes('enemy'))return '#df5555';
  if(t.includes('colleague')||t.includes('mentor'))return '#b99ae8';
+
  return '#d7b878';
 }
+
 function familyTree(){
  const universes=universeNames();
- const characters=db.characters.filter(c=>selectedTreeUniverse==='all'||c.universe===selectedTreeUniverse);
+
+ const characters=db.characters.filter(c=>
+  selectedTreeUniverse==='all'||c.universe===selectedTreeUniverse
+ );
+
  const ids=new Set(characters.map(c=>c.id));
- const rels=db.relationships.filter(r=>ids.has(r.characterA)&&ids.has(r.characterB));
- const nodes=characters.map((c,i)=>({c,x:12+(i%4)*25,y:14+Math.floor(i/4)*28}));
+
+ const rels=db.relationships.filter(r=>
+  ids.has(r.characterA)&&ids.has(r.characterB)
+ );
+
+ const nodes=characters.map((c,i)=>({
+  c,
+  x:12+(i%4)*25,
+  y:14+Math.floor(i/4)*28
+ }));
+
  const svg=rels.map(r=>{
   const a=nodes.find(n=>n.c.id===r.characterA);
   const b=nodes.find(n=>n.c.id===r.characterB);
+
   if(!a||!b)return '';
+
   const color=relationshipColor(r.type);
+
   return `<line x1="${a.x}%" y1="${a.y}%" x2="${b.x}%" y2="${b.y}%" stroke="${color}" stroke-width="2.2" ${isAdoption(r.type)?'stroke-dasharray="6 5"':''}/>`;
  }).join('');
 
@@ -554,10 +1282,12 @@ function familyTree(){
   <button class="btn primary" onclick="openCreate('relationships')">＋ Connect characters</button>
   <button class="btn" onclick="openCreate('characters')">＋ Add character</button>
  </div>
+
  <div class="card">
   <span class="tag">Connected character map</span>
   <h3>Family & relationships</h3>
   <p>Every character appears once. Lines connect the people you have linked. Character cards show portrait, name and age.</p>
+
   <div class="tree-area">
    <div class="tree-stage">
     ${characters.length?`
@@ -568,10 +1298,12 @@ function familyTree(){
         ${n.c.portrait?`<img src="${esc(n.c.portrait)}" alt="">`:`<span class="portrait" style="display:grid;place-items:center">♙</span>`}
         <span><strong>${esc(n.c.name)}</strong><small>Age ${esc(n.c.age||'Unknown')}</small></span>
        </button>
-      </div>`).join('')}`:
-     '<div class="empty">Add characters to begin building your relationship map.</div>'}
+      </div>
+     `).join('')}
+    `:'<div class="empty">Add characters to begin building your relationship map.</div>'}
    </div>
   </div>
+
   <div class="key-list">
    ${[
     ['Family','#111111','solid'],
@@ -581,10 +1313,20 @@ function familyTree(){
     ['Rivalry / enemies','#df5555','solid'],
     ['Professional','#b99ae8','solid'],
     ['Other','#d7b878','solid']
-   ].map(x=>`<div class="key-item"><span class="key-line ${x[2]}" style="${x[2]==='solid'?`background:${x[1]}`:''}"></span>${x[0]}</div>`).join('')}
+   ].map(x=>`
+    <div class="key-item">
+     <span class="key-line ${x[2]}" style="${x[2]==='solid'?`background:${x[1]}`:''}"></span>
+     ${x[0]}
+    </div>
+   `).join('')}
   </div>
  </div>
- <div class="section-head"><h2>Connection details</h2><button class="btn small" onclick="openCreate('relationships')">＋ Add connection</button></div>
+
+ <div class="section-head">
+  <h2>Connection details</h2>
+  <button class="btn small" onclick="openCreate('relationships')">＋ Add connection</button>
+ </div>
+
  <div class="card">
   ${rels.length?rels.map(r=>`
    <div class="relationship-line">
@@ -598,18 +1340,24 @@ function familyTree(){
      <button class="btn small" onclick="editEntry('relationships','${r.id}')">Edit</button>
      <button class="btn small danger" onclick="deleteEntry('relationships','${r.id}')">Remove</button>
     </div>
-   </div>`).join(''):'<p class="muted">No connections recorded yet.</p>'}
+   </div>
+  `).join(''):'<p class="muted">No connections recorded yet.</p>'}
  </div>`;
 }
+
 function familyTreeSelect(v){
  selectedTreeUniverse=v;
  familyTree();
 }
 
-/* WORLD ATLAS */
+/* =========================================================
+   WORLD ATLAS
+========================================================= */
+
 function atlasPage(){
  const places=db.locations;
  const active=places.find(p=>p.id===selectedLocation);
+
  document.getElementById('content').innerHTML=`
  <div class="map-controls">
   <select class="field" style="max-width:260px" id="mapUniverse" onchange="filterMap()">
@@ -619,6 +1367,7 @@ function atlasPage(){
   <input class="field search" id="mapSearch" placeholder="Find a city, landmark or place..." oninput="filterMap()">
   <button class="btn primary" onclick="openCreate('locations')">＋ Add location</button>
  </div>
+
  <div class="map-layout">
   <div class="map-board" id="mapBoard">
    <svg viewBox="0 0 1000 650" preserveAspectRatio="none">
@@ -629,13 +1378,22 @@ function atlasPage(){
     <path class="map-land" d="M650 365 L720 345 795 380 820 445 775 520 710 545 660 490 630 425Z"/>
     <path class="map-land" d="M855 430 L910 415 950 450 930 500 880 510 850 475Z"/>
    </svg>
+
    ${places.map(p=>`
-    <button class="map-marker" data-id="${p.id}" data-universe="${esc(p.universe||'')}" data-search="${esc((p.name+' '+p.type+' '+p.description).toLowerCase())}" style="left:${clamp(p.longitude,5,95,50)}%;top:${clamp(p.latitude,5,95,50)}%" title="${esc(p.name)}" onclick="selectMapLocation('${p.id}')">⌖</button>
+    <button class="map-marker"
+     data-id="${p.id}"
+     data-universe="${esc(p.universe||'')}"
+     data-search="${esc((p.name+' '+p.type+' '+p.description).toLowerCase())}"
+     style="left:${clamp(p.longitude,5,95,50)}%;top:${clamp(p.latitude,5,95,50)}%"
+     title="${esc(p.name)}"
+     onclick="selectMapLocation('${p.id}')">⌖</button>
    `).join('')}
   </div>
+
   <div class="map-side">
    <div class="map-info">
     <span class="tag">Selected location</span>
+
     ${active?`
      <h3>${esc(active.name)}</h3>
      <p class="muted">${esc(active.type||'Location')} · ${esc(active.universe||'No universe')}</p>
@@ -653,6 +1411,7 @@ function atlasPage(){
      <p class="map-tip">Choose a marker to view its description, history, images and details. Add a location to place a new marker on the map.</p>
     `}
    </div>
+
    <div class="map-info">
     <strong>Map markers</strong>
     <p class="map-tip">Your locations are plotted using their saved map positions. Enter a horizontal and vertical position from 0 to 100 when creating a location. This is a schematic fantasy map, not a real geographic map.</p>
@@ -661,23 +1420,30 @@ function atlasPage(){
   </div>
  </div>`;
 }
+
 function clamp(v,min,max,def){
  const n=Number(v);
  return Number.isFinite(n)&&v!==''?Math.min(max,Math.max(min,n)):def;
 }
+
 function selectMapLocation(i){
  selectedLocation=i;
  atlasPage();
 }
+
 function filterMap(){
  const u=document.getElementById('mapUniverse')?.value||'';
  const q=document.getElementById('mapSearch')?.value.toLowerCase()||'';
+
  document.querySelectorAll('.map-marker').forEach(m=>{
   m.style.display=(!u||m.dataset.universe===u)&&m.dataset.search.includes(q)?'grid':'none';
  });
 }
 
-/* BACKUP */
+/* =========================================================
+   BACKUP AND IMPORT
+========================================================= */
+
 function backup(){
  document.getElementById('content').innerHTML=`
  <div class="grid">
@@ -687,52 +1453,82 @@ function backup(){
    <p>Save all characters, universes, places, relationships, groups, events and links into one JSON backup file.</p>
    <button class="btn primary" onclick="exportData()">↓ Export backup</button>
   </div>
+
   <div class="card">
    <span class="tag">Import</span>
    <h3>Restore a backup</h3>
-   <p>Import a previous backup. This replaces the data currently stored in this browser.</p>
+   <p>Import a previous backup. This replaces the data currently stored in your cloud archive, so export a backup first.</p>
    <button class="btn" onclick="document.getElementById('importFile').click()">↑ Choose backup file</button>
   </div>
+
   <div class="card">
-   <span class="tag">Storage</span>
-   <h3>Browser storage</h3>
-   <p>Your entries are saved locally in this browser. Cloud sync is not connected in this version.</p>
+   <span class="tag">Cloud storage</span>
+   <h3>Your account</h3>
+   <p>Your entries are saved to your private Supabase account and can be accessed when you sign in on another device.</p>
+   <p class="muted">${esc(currentUser?.email||'')}</p>
+   <button class="btn" onclick="signOut()">Sign out</button>
   </div>
  </div>
+
  <div class="section-head"><h2>Archive summary</h2></div>
- <div class="stats">${Object.entries(counts()).map(([k,v])=>`<div class="stat"><span>${configs[k].title}</span><strong>${v}</strong></div>`).join('')}</div>
- <button class="btn danger" onclick="clearAll()">Clear all local data</button>`;
+ <div class="stats">
+  ${Object.entries(counts()).map(([k,v])=>`
+   <div class="stat"><span>${configs[k].title}</span><strong>${v}</strong></div>
+  `).join('')}
+ </div>
+
+ <button class="btn danger" onclick="clearAll()">Clear all archive data</button>`;
 }
+
 function exportData(){
  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
  const a=document.createElement('a');
  const url=URL.createObjectURL(blob);
+
  a.href=url;
  a.download='character-universe-hq-backup.json';
  a.click();
+
  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
+
 document.getElementById('importFile').addEventListener('change',e=>{
  const f=e.target.files[0];
  if(!f)return;
+
  const r=new FileReader();
+
  r.onload=()=>{
   try{
    const d=JSON.parse(r.result);
+
    if(!d||typeof d!=='object')throw Error();
+
+   if(!confirm('Importing this backup will replace the entries in your current cloud archive. Export a backup first if you want to keep the current version. Continue?')){
+    e.target.value='';
+    return;
+   }
+
    db={...freshBlank(),...d};
-   Object.keys(blank).forEach(k=>{if(!Array.isArray(db[k]))db[k]=[]});
+
+   Object.keys(blank).forEach(k=>{
+    if(!Array.isArray(db[k]))db[k]=[];
+   });
+
    save();
-   alert('Backup imported successfully.');
+   alert('Backup imported. Your cloud archive is now syncing.');
+
   }catch(_){
    alert('That file could not be read as a Character Universe HQ backup.');
   }
  };
+
  r.readAsText(f);
  e.target.value='';
 });
+
 function clearAll(){
- if(confirm('This will delete every entry saved in this browser. Export a backup first if you want to keep your work.')){
+ if(confirm('This will delete every entry in your cloud archive. Export a backup first if you want to keep your work. Are you sure?')){
   db=freshBlank();
   selectedLocation=null;
   selectedTreeUniverse='all';
@@ -740,8 +1536,27 @@ function clearAll(){
  }
 }
 
-/* START */
-render();
+/* =========================================================
+   STARTUP
+========================================================= */
+
+async function startApp(){
+ showAuth();
+
+ const {data,error}=await supabaseClient.auth.getSession();
+
+ if(error){
+  showAuthMessage(error.message,'error');
+  return;
+ }
+
+ if(data.session?.user){
+  await startUserSession(data.session.user);
+ }
+}
+
+startApp();
+
 </script>
 </body>
 </html>
