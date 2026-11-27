@@ -13,36 +13,71 @@
  --gold:#d7b878;--teal:#82c7c0;--rose:#d99cae;
  --blue:#65a9e8;--purple:#b99ae8;--red:#df7777;
  --shadow:0 16px 45px #0005;
+ --font:Inter,system-ui,sans-serif;
+ --overlay:.48;--blur:0px;
 }
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 80% 0%,#243044 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.5 Inter,system-ui,sans-serif}
+body{
+ margin:0;background:var(--bg);color:var(--text);
+ font:15px/1.5 var(--font);min-height:100vh;
+}
+#hqBackground{
+ position:fixed;inset:0;z-index:-2;
+ background-position:center;background-size:cover;
+ background-repeat:no-repeat;filter:blur(var(--blur));
+ transform:scale(1.03);pointer-events:none;
+}
+#hqOverlay{
+ position:fixed;inset:0;z-index:-1;
+ background:rgba(5,9,18,var(--overlay));pointer-events:none;
+}
 button,input,textarea,select{font:inherit}
 button{cursor:pointer}
 .shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
-aside{background:#101725ef;border-right:1px solid var(--line);padding:26px 18px;position:sticky;top:0;height:100vh;overflow:auto}
+aside{
+ background:color-mix(in srgb,var(--panel) 94%,transparent);
+ border-right:1px solid var(--line);padding:26px 18px;
+ position:sticky;top:0;height:100vh;overflow:auto;
+ backdrop-filter:blur(14px)
+}
 .brand{display:flex;gap:12px;align-items:center;padding:4px 8px 25px}
-.sigil{width:42px;height:42px;border:1px solid #8e805e;border-radius:13px;display:grid;place-items:center;color:var(--gold);font-size:21px;background:linear-gradient(145deg,#273448,#121b2a)}
+.sigil{
+ width:42px;height:42px;border:1px solid var(--gold);
+ border-radius:13px;display:grid;place-items:center;
+ color:var(--gold);font-size:21px;
+ background:linear-gradient(145deg,var(--panel2),var(--bg))
+}
 .brand strong{display:block;letter-spacing:.08em;font-size:13px}
 .brand small{color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
-.nav-label{font-size:10px;letter-spacing:.16em;color:#74839a;text-transform:uppercase;padding:15px 10px 7px}
-nav button{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;color:#aeb9c9;padding:11px 12px;border-radius:10px;text-align:left;margin:2px 0}
-nav button:hover,nav button.active{background:#263348;color:var(--text)}
+.nav-label{font-size:10px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;padding:15px 10px 7px}
+nav button{
+ display:flex;align-items:center;gap:12px;width:100%;
+ border:0;background:transparent;color:var(--muted);
+ padding:11px 12px;border-radius:10px;text-align:left;margin:2px 0
+}
+nav button:hover,nav button.active{background:var(--panel2);color:var(--text)}
 nav button.active{box-shadow:inset 2px 0 var(--gold)}
 nav .ico{width:20px;text-align:center;color:var(--gold)}
-.side-note{margin:30px 5px 0;padding:14px;border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:12px;background:#182234}
+.side-note{margin:30px 5px 0;padding:14px;border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:12px;background:var(--panel)}
 main{min-width:0;padding:30px clamp(18px,4vw,54px) 60px;max-width:1700px;width:100%;margin:auto}
 .topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:30px}
 .eyebrow{color:var(--gold);font-size:11px;letter-spacing:.17em;text-transform:uppercase}
 h1{font-family:Georgia,serif;font-size:clamp(30px,4vw,43px);font-weight:400;margin:5px 0 4px}
 .subtitle{color:var(--muted);margin:0}
 .actions,.toolbar{display:flex;gap:9px;flex-wrap:wrap}
-.btn{border:1px solid var(--line);background:#202c3e;color:var(--text);border-radius:9px;padding:9px 14px}
-.btn:hover{border-color:#71849e;background:#293950}
-.btn.primary{background:linear-gradient(135deg,#d7b878,#b89458);color:#18202c;border:0;font-weight:700}
+.btn{
+ border:1px solid var(--line);background:var(--panel2);
+ color:var(--text);border-radius:9px;padding:9px 14px
+}
+.btn:hover{border-color:var(--gold)}
+.btn.primary{background:var(--gold);color:#18202c;border:0;font-weight:700}
 .btn.danger{color:#f0a3a3}
 .btn.small{padding:6px 10px;font-size:12px}
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:25px 0}
-.stat,.panel,.card{background:linear-gradient(145deg,#192435,#141d2b);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}
+.stat,.panel,.card{
+ background:color-mix(in srgb,var(--panel) 94%,transparent);
+ border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)
+}
 .stat{padding:18px}.stat span{color:var(--muted);font-size:12px}
 .stat strong{display:block;font:32px Georgia,serif;margin-top:7px;color:var(--gold)}
 .section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:27px 0 14px}
@@ -52,59 +87,47 @@ h1{font-family:Georgia,serif;font-size:clamp(30px,4vw,43px);font-weight:400;marg
 .card{padding:17px;box-shadow:none;min-width:0}
 .card-top{display:flex;justify-content:space-between;align-items:start;gap:12px}
 .card h3{font:21px Georgia,serif;margin:0 0 5px}
-.tag{display:inline-block;border:1px solid #45516a;color:#c5d0df;border-radius:99px;padding:3px 8px;font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+.tag{display:inline-block;border:1px solid var(--line);color:var(--text);border-radius:99px;padding:3px 8px;font-size:10px;letter-spacing:.06em;text-transform:uppercase}
 .card p{color:var(--muted);font-size:13px;margin:10px 0;overflow-wrap:anywhere}
 .card-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:12px;margin-top:13px;gap:8px;flex-wrap:wrap}
-.field,textarea,select{width:100%;background:#0f1724;border:1px solid #344258;border-radius:9px;color:var(--text);padding:10px 12px;outline:none}
+.field,textarea,select{
+ width:100%;background:var(--bg);border:1px solid var(--line);
+ border-radius:9px;color:var(--text);padding:10px 12px;outline:none
+}
 .field:focus,textarea:focus,select:focus{border-color:var(--gold)}
 textarea{min-height:95px;resize:vertical}
-select option{background:#172233;color:white}
+select option{background:var(--panel);color:var(--text)}
 .search{flex:1;min-width:190px}
-.empty{padding:38px 20px;text-align:center;border:1px dashed #3a4960;border-radius:14px;color:var(--muted);grid-column:1/-1}
-.notice{border:1px solid #6d6043;background:#2b281f;color:#d9cba8;border-radius:11px;padding:12px 14px;font-size:12px;margin-top:20px}
+.empty{padding:38px 20px;text-align:center;border:1px dashed var(--line);border-radius:14px;color:var(--muted);grid-column:1/-1}
+.notice{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:11px;padding:12px 14px;font-size:12px;margin-top:20px}
 .modal-wrap{position:fixed;inset:0;background:#050912d9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}
 .modal-wrap.open{display:flex}
-.modal{background:#172233;border:1px solid #45536a;border-radius:16px;width:min(760px,100%);max-height:90vh;overflow:auto;padding:22px;box-shadow:0 25px 80px #0009}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:min(760px,100%);max-height:90vh;overflow:auto;padding:22px;box-shadow:0 25px 80px #0009}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:17px}
 .modal h2{font:26px Georgia,serif;margin:0}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .form-field{display:flex;flex-direction:column;gap:6px;min-width:0}
 .form-field.full{grid-column:1/-1}
-.form-field label{font-size:12px;color:#bdc8d8}
+.form-field label{font-size:12px;color:var(--muted)}
 .modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
 .link{color:var(--teal);text-decoration:none;overflow-wrap:anywhere}
-.detail{white-space:pre-wrap;color:#c1ccda;font-size:13px}
-.portrait{width:58px;height:58px;object-fit:cover;border-radius:12px;border:1px solid #88764e;background:#202c3e}
-.person-card{display:flex;align-items:center;gap:12px;background:#202c3e;border:1px solid #665c46;border-radius:12px;padding:12px;text-align:left;color:var(--text);min-width:170px}
-.person-card img{width:48px;height:48px;object-fit:cover;border-radius:9px}
-.person-card strong{display:block;font-family:Georgia,serif}
-.person-card small{color:var(--muted)}
-.key-list{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}
-.key-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
-.key-line{width:32px;height:3px;border-radius:4px}
-.key-line.dotted{background:repeating-linear-gradient(90deg,#111 0 5px,transparent 5px 9px);border:1px solid #777;height:3px}
-.tree-area{overflow:auto;min-height:320px;padding:25px 8px}
-.tree-stage{position:relative;min-width:850px;min-height:480px}
-.tree-stage svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
-.tree-node{position:absolute;transform:translate(-50%,-50%);z-index:2}
-.tree-node .person-card{min-width:155px}
-.tree-node .person-card:hover{border-color:var(--gold);background:#2b3b50}
-.timeline{position:relative;margin:20px 0 0 9px;padding-left:25px;border-left:1px solid #58647a}
+.portrait{width:58px;height:58px;object-fit:cover;border-radius:12px;border:1px solid var(--gold);background:var(--panel2)}
+.timeline{position:relative;margin:20px 0 0 9px;padding-left:25px;border-left:1px solid var(--line)}
 .event{position:relative;padding:0 0 26px 12px}
-.event:before{content:"";position:absolute;left:-32px;top:7px;width:11px;height:11px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px #d7b87822}
+.event:before{content:"";position:absolute;left:-32px;top:7px;width:11px;height:11px;border-radius:50%;background:var(--gold)}
 .event time{color:var(--teal);font-size:12px}
 .event h3{font:20px Georgia,serif;margin:3px 0}
 .event p{color:var(--muted);margin:4px 0;font-size:13px}
 .timeline-controls{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
 .map-layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:15px}
-.map-board{position:relative;min-height:520px;overflow:hidden;border:1px solid #48566a;border-radius:15px;background:#172a34}
+.map-board{position:relative;min-height:520px;overflow:hidden;border:1px solid var(--line);border-radius:15px;background:#172a34}
 .map-board svg{position:absolute;width:100%;height:100%;inset:0;pointer-events:none}
 .map-land{fill:#34443e;stroke:#8e967c;stroke-width:2}
 .map-water{fill:#172f3e}
-.map-marker{position:absolute;transform:translate(-50%,-50%);z-index:2;border:1px solid #e3c88d;background:#182333;color:var(--gold);border-radius:50%;width:30px;height:30px;box-shadow:0 3px 12px #0008}
+.map-marker{position:absolute;transform:translate(-50%,-50%);z-index:2;border:1px solid #e3c88d;background:#182333;color:var(--gold);border-radius:50%;width:30px;height:30px}
 .map-marker:hover,.map-marker.selected{background:var(--gold);color:#18202c}
 .map-side{display:flex;flex-direction:column;gap:12px}
-.map-info{background:#192435;border:1px solid var(--line);border-radius:13px;padding:15px}
+.map-info{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px}
 .map-info h3{font:21px Georgia,serif;margin:0}
 .map-tip{color:var(--muted);font-size:12px}
 .location-image{width:100%;max-height:160px;object-fit:cover;border-radius:9px;margin-top:10px}
@@ -112,23 +135,108 @@ select option{background:#172233;color:white}
 .relationship-line{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .relationship-line:last-child{border-bottom:0}
 #authScreen{min-height:100vh;display:none;align-items:center;justify-content:center;padding:20px}
-.auth-card{width:min(460px,100%);background:linear-gradient(145deg,#192638,#111a28);border:1px solid #45536a;border-radius:18px;padding:28px;box-shadow:var(--shadow)}
+.auth-card{width:min(460px,100%);background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:var(--shadow)}
 .auth-card h1{font-size:34px;margin:8px 0}
 .auth-card p{color:var(--muted);font-size:13px}
 .auth-card .form-field{margin:15px 0}
 .auth-card .btn{width:100%;margin-top:10px}
-.auth-message{padding:11px;border-radius:9px;background:#202c3e;border:1px solid var(--line);margin-top:14px;font-size:13px;display:none}
+.auth-message{padding:11px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);margin-top:14px;font-size:13px;display:none}
 .auth-message.error{border-color:#a45c5c;color:#ffb4b4}
 .auth-message.success{border-color:#557f73;color:#a9e4d0}
 .account-line{font-size:11px;color:var(--muted);margin-top:12px;overflow-wrap:anywhere}
 .sync-status{font-size:11px;color:var(--teal);padding:8px 10px;border:1px solid var(--line);border-radius:9px}
 .sync-status.error{color:#ffaaaa}
-@media(max-width:950px){.shell{grid-template-columns:1fr}aside{position:relative;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--line)}.brand{padding:2px 5px 10px}.nav-label,.side-note{display:none}nav{display:flex;overflow:auto;gap:4px;padding-bottom:3px}nav button{white-space:nowrap;width:auto;padding:9px 11px;font-size:12px}nav .ico{width:auto}.map-layout{grid-template-columns:1fr}}
-@media(max-width:600px){.topbar{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr);gap:9px}.stat{padding:13px}.stat strong{font-size:27px}.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}.actions{width:100%}.actions .btn{flex:1}}
+
+/* FAMILY TREE */
+
+.tree-area{overflow:auto;padding:22px 8px;min-height:350px}
+.tree-stage{
+ position:relative;margin:auto;
+ min-width:850px;min-height:450px;
+}
+.tree-stage svg{
+ position:absolute;inset:0;width:100%;height:100%;
+ overflow:visible;z-index:1
+}
+.tree-edge{
+ fill:none;stroke-width:2.8;
+ pointer-events:stroke;cursor:pointer;
+ transition:stroke-width .15s,opacity .15s
+}
+.tree-edge:hover{stroke-width:5}
+.tree-edge.dimmed{opacity:.15}
+.tree-edge.selected{stroke-width:5}
+.tree-node{
+ position:absolute;transform:translate(-50%,-50%);
+ z-index:2;width:175px
+}
+.person-card{
+ display:flex;align-items:center;gap:10px;
+ background:var(--panel2);border:1px solid var(--line);
+ border-radius:12px;padding:10px;text-align:left;
+ color:var(--text);width:100%;min-width:0;
+ box-shadow:0 8px 20px #0005
+}
+.person-card img,.person-placeholder{
+ width:48px;height:48px;flex-shrink:0;
+ object-fit:cover;border-radius:9px;
+ border:1px solid var(--gold)
+}
+.person-placeholder{display:grid;place-items:center;font-size:22px;color:var(--gold)}
+.person-card strong{display:block;font-family:Georgia,serif;overflow-wrap:anywhere}
+.person-card small{display:block;color:var(--muted);font-size:11px}
+.person-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.generation-label{
+ position:absolute;left:0;transform:translateY(-50%);
+ color:var(--muted);font-size:10px;text-transform:uppercase;
+ letter-spacing:.13em;writing-mode:vertical-rl;
+}
+.tree-tooltip{
+ position:sticky;bottom:8px;z-index:4;
+ background:var(--panel);border:1px solid var(--gold);
+ border-radius:10px;padding:12px;margin-top:15px;
+ display:none;box-shadow:var(--shadow)
+}
+.tree-tooltip.show{display:block}
+.tree-tooltip p{margin:4px 0;color:var(--muted);font-size:12px}
+.key-list{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}
+.key-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+.key-line{width:32px;height:3px;border-radius:4px}
+.key-line.dotted{background:repeating-linear-gradient(90deg,#111 0 5px,transparent 5px 9px);border:1px solid #777;height:3px}
+.tree-hint{font-size:12px;color:var(--muted);margin-top:10px}
+.settings-section{margin:18px 0}
+.settings-section h3{font:21px Georgia,serif;margin:0 0 12px}
+.settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.color-control{display:flex;align-items:center;gap:12px}
+.color-control input[type=color]{width:48px;height:40px;padding:2px;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+.preview-box{height:100px;border-radius:12px;border:1px solid var(--line);background:var(--panel);display:flex;align-items:center;justify-content:center;color:var(--muted);font-family:Georgia,serif}
+.range-row{display:flex;align-items:center;gap:10px}
+.range-row input{flex:1;min-width:0}
+@media(max-width:950px){
+ .shell{grid-template-columns:1fr}
+ aside{position:relative;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--line)}
+ .brand{padding:2px 5px 10px}
+ .nav-label,.side-note{display:none}
+ nav{display:flex;overflow:auto;gap:4px;padding-bottom:3px}
+ nav button{white-space:nowrap;width:auto;padding:9px 11px;font-size:12px}
+ nav .ico{width:auto}
+ .map-layout{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+ .topbar{align-items:flex-start;flex-direction:column}
+ .grid{grid-template-columns:1fr}
+ .stats{grid-template-columns:repeat(2,1fr);gap:9px}
+ .stat{padding:13px}.stat strong{font-size:27px}
+ .form-grid,.settings-grid{grid-template-columns:1fr}
+ .form-field.full{grid-column:auto}
+ .actions{width:100%}.actions .btn{flex:1}
+}
 </style>
 </head>
 
 <body>
+<div id="hqBackground"></div>
+<div id="hqOverlay"></div>
 
 <div id="authScreen">
  <div class="auth-card">
@@ -136,7 +244,6 @@ select option{background:#172233;color:white}
   <div class="eyebrow">Your private creative archive</div>
   <h1>Character Universe HQ</h1>
   <p>Sign in to access your worlds, characters and timelines from your devices.</p>
-
   <form id="authForm">
    <div class="form-field">
     <label for="authEmail">Email address</label>
@@ -148,11 +255,10 @@ select option{background:#172233;color:white}
    </div>
    <button class="btn primary" id="authSubmit" type="submit">Sign in</button>
   </form>
-
   <button class="btn" id="switchAuth" type="button">Create a new account</button>
   <button class="btn" id="resetPassword" type="button">Forgot password?</button>
   <div class="auth-message" id="authMessage"></div>
-  <div class="account-line">Your archive is private to your account. Do not share your password with anyone.</div>
+  <div class="account-line">Your archive is private to your account. Do not share your password.</div>
  </div>
 </div>
 
@@ -193,7 +299,7 @@ select option{background:#172233;color:white}
  </div>
  <div class="account-line" id="accountEmail"></div>
  <div id="content"></div>
- <div class="notice">CLOUD ARCHIVE · Your entries are saved to your private Supabase account. Export a backup occasionally as an extra precaution.</div>
+ <div class="notice">CLOUD ARCHIVE · Your entries and personal settings are saved to your private account. Export a backup occasionally as an extra precaution.</div>
 </main>
 </div>
 
@@ -214,37 +320,52 @@ select option{background:#172233;color:white}
 </div>
 
 <input type="file" id="importFile" accept="application/json" hidden>
+<input type="file" id="hqBackgroundFile" accept="image/*" hidden>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
 'use strict';
 
-/* SUPABASE CONNECTION */
+/* SUPABASE */
 
 const SUPABASE_URL='https://gxqywwapwefdexumxcnk.supabase.co';
 const SUPABASE_KEY='sb_publishable_UJRdvNNZguI2HYBRI8BvzA_g5h_AK1j';
-
-const supabaseClient=window.supabase.createClient(
- SUPABASE_URL,
- SUPABASE_KEY
-);
-
-/* LOCAL DATA AND APP STATE */
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 const KEY='characterUniverseHQ_v1';
+const CLOUD_MARKER='__archive_state__';
+const SETTINGS_KEY='__hq_settings__';
 
 const blank={
- characters:[],
- universes:[],
- locations:[],
- relationships:[],
- groups:[],
- events:[],
- links:[]
+ characters:[],universes:[],locations:[],
+ relationships:[],groups:[],events:[],links:[]
 };
 
-const CLOUD_MARKER='__archive_state__';
+const DEFAULT_SETTINGS={
+ theme:'midnight',
+ bg:'#0c111b',
+ panel:'#151d2b',
+ panel2:'#1b2637',
+ line:'#2a374b',
+ text:'#edf1f8',
+ muted:'#9aa8bc',
+ accent:'#d7b878',
+ font:'Inter',
+ overlay:48,
+ blur:0,
+ fit:'cover',
+ position:'center',
+ backgroundPath:''
+};
+
+const THEMES={
+ midnight:{bg:'#0c111b',panel:'#151d2b',panel2:'#1b2637',line:'#2a374b',text:'#edf1f8',muted:'#9aa8bc',accent:'#d7b878'},
+ forest:{bg:'#101a17',panel:'#192820',panel2:'#24382d',line:'#3b5143',text:'#edf3ed',muted:'#a4b6a8',accent:'#b5c99a'},
+ royal:{bg:'#151126',panel:'#211b38',panel2:'#30274b',line:'#494064',text:'#f1edfa',muted:'#b5abc9',accent:'#c2a4ed'},
+ parchment:{bg:'#282219',panel:'#383024',panel2:'#49402f',line:'#65573e',text:'#f4ead6',muted:'#c2b69e',accent:'#e0bd7c'},
+ ocean:{bg:'#0d1b27',panel:'#142a3a',panel2:'#1d394b',line:'#34576b',text:'#e7f2f7',muted:'#a3bdc9',accent:'#83c9d1'},
+ rose:{bg:'#24151e',panel:'#35212c',panel2:'#492d3b',line:'#684455',text:'#f7eaf0',muted:'#c8aab7',accent:'#e5a5bd'}
+};
 
 function freshBlank(){
  return Object.fromEntries(Object.keys(blank).map(k=>[k,[]]));
@@ -254,28 +375,23 @@ function load(){
  try{
   const stored=JSON.parse(localStorage.getItem(KEY)||'{}');
   const result={...freshBlank(),...stored};
-  Object.keys(blank).forEach(k=>{
-   if(!Array.isArray(result[k]))result[k]=[];
-  });
+  Object.keys(blank).forEach(k=>{if(!Array.isArray(result[k]))result[k]=[]});
   return result;
- }catch(e){
-  return freshBlank();
- }
+ }catch(e){return freshBlank()}
 }
 
 let db=load();
+let hqSettings={...DEFAULT_SETTINGS};
 let page='dashboard';
 let editing=null;
 let selectedTreeUniverse='all';
 let selectedLocation=null;
-
 let currentUser=null;
 let cloudReady=false;
 let cloudRowIds={};
 let cloudKnownIds={};
 let syncQueue=Promise.resolve();
 let authMode='signin';
-
 let refreshingCloud=false;
 let lastCloudRefresh=0;
 
@@ -285,18 +401,13 @@ function id(){
 
 function esc(s=''){
  return String(s).replace(/[&<>"']/g,c=>({
-  '&':'&amp;',
-  '<':'&lt;',
-  '>':'&gt;',
-  '"':'&quot;',
-  "'":'&#39;'
+  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
  }[c]));
 }
 
 function characterName(i){
  return db.characters.find(c=>c.id===i)?.name||i||'Unknown';
 }
-
 function universeNames(){
  return [...new Set([
   ...db.universes.map(u=>u.name),
@@ -306,17 +417,278 @@ function universeNames(){
   ...db.events.map(e=>e.universe)
  ].filter(Boolean))];
 }
-
-function locationName(i){
- return db.locations.find(l=>l.id===i)?.name||i||'';
-}
-
 function setSyncStatus(message,isError=false){
  const el=document.getElementById('syncStatus');
  if(!el)return;
  el.textContent=message;
  el.classList.toggle('error',isError);
 }
+
+/* PERSONAL APPEARANCE SETTINGS */
+
+function applyTheme(){
+ const root=document.documentElement;
+ const s=hqSettings;
+ const theme=THEMES[s.theme]||THEMES.midnight;
+
+ const values={
+  '--bg':s.bg||theme.bg,
+  '--panel':s.panel||theme.panel,
+  '--panel2':s.panel2||theme.panel2,
+  '--line':s.line||theme.line,
+  '--text':s.text||theme.text,
+  '--muted':s.muted||theme.muted,
+  '--gold':s.accent||theme.accent,
+  '--overlay':(Number(s.overlay??48)/100).toString(),
+  '--blur':(Number(s.blur??0))+'px',
+  '--font':fontStack(s.font)
+ };
+
+ Object.entries(values).forEach(([k,v])=>root.style.setProperty(k,v));
+
+ document.getElementById('hqBackground').style.backgroundSize=s.fit||'cover';
+ document.getElementById('hqBackground').style.backgroundPosition=s.position||'center';
+}
+
+function fontStack(font){
+ const fonts={
+  Inter:'Inter,system-ui,sans-serif',
+  Georgia:'Georgia,serif',
+  Arial:'Arial,sans-serif',
+  Verdana:'Verdana,sans-serif',
+  'Trebuchet MS':'Trebuchet MS,sans-serif',
+  'Courier New':'Courier New,monospace'
+ };
+ return fonts[font]||fonts.Inter;
+}
+
+async function showBackground(){
+ const el=document.getElementById('hqBackground');
+ if(!hqSettings.backgroundPath||!currentUser){
+  el.style.backgroundImage='none';
+  return;
+ }
+ try{
+  const {data,error}=await supabaseClient.storage
+   .from('hq-backgrounds')
+   .createSignedUrl(hqSettings.backgroundPath,3600);
+  if(error)throw error;
+  el.style.backgroundImage=`url("${data.signedUrl}")`;
+ }catch(error){
+  console.warn('Background image could not be loaded:',error);
+  el.style.backgroundImage='none';
+ }
+}
+
+async function saveHQSettings(){
+ if(!currentUser||!cloudReady)return;
+ setSyncStatus('☁ Saving appearance...');
+ try{
+  const row={
+   id:crypto.randomUUID(),
+   user_id:currentUser.id,
+   kind:'events',
+   entry_key:SETTINGS_KEY,
+   data:{...hqSettings,id:SETTINGS_KEY},
+   updated_at:new Date().toISOString()
+  };
+  const {error}=await supabaseClient.from('archive_entries').upsert(row,{
+   onConflict:'user_id,kind,entry_key'
+  });
+  if(error)throw error;
+  setSyncStatus('☁ Appearance saved');
+ }catch(error){
+  console.error(error);
+  setSyncStatus('Settings save failed',true);
+  alert('Your appearance settings could not be saved. Check your cloud table permissions and try again.\n\n'+error.message);
+ }
+}
+
+function changeTheme(theme){
+ const values=THEMES[theme];
+ if(!values)return;
+ hqSettings={
+  ...hqSettings,...values,theme
+ };
+ applyTheme();
+ renderSettingsControls();
+ saveHQSettings();
+}
+
+function updateSetting(key,value){
+ hqSettings[key]=value;
+ if(key==='theme')hqSettings.theme='custom';
+ applyTheme();
+ saveHQSettings();
+}
+
+async function uploadHQBackground(file){
+ if(!file)return;
+ if(!file.type.startsWith('image/')){
+  alert('Please choose an image file.');
+  return;
+ }
+ if(file.size>8*1024*1024){
+  alert('Please choose an image smaller than 8 MB.');
+  return;
+ }
+ if(!currentUser)return;
+
+ setSyncStatus('☁ Uploading background...');
+ try{
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const path=currentUser.id+'/'+id()+'.'+ext;
+
+  const {error}=await supabaseClient.storage
+   .from('hq-backgrounds')
+   .upload(path,file,{upsert:false,contentType:file.type});
+
+  if(error)throw error;
+
+  const oldPath=hqSettings.backgroundPath;
+  hqSettings.backgroundPath=path;
+  await saveHQSettings();
+  await showBackground();
+
+  if(oldPath){
+   await supabaseClient.storage.from('hq-backgrounds').remove([oldPath]);
+  }
+
+  renderSettingsControls();
+  alert('Your background image has been uploaded and saved to your account.');
+ }catch(error){
+  console.error(error);
+  setSyncStatus('Background upload failed',true);
+  alert('The background could not be uploaded.\n\nMake sure the private "hq-backgrounds" storage bucket and its access policies have been created in Supabase.\n\n'+error.message);
+ }
+}
+
+async function removeHQBackground(){
+ if(!hqSettings.backgroundPath)return;
+ if(!confirm('Remove your custom background image?'))return;
+ const oldPath=hqSettings.backgroundPath;
+ hqSettings.backgroundPath='';
+ await saveHQSettings();
+ await showBackground();
+ try{
+  await supabaseClient.storage.from('hq-backgrounds').remove([oldPath]);
+ }catch(e){console.warn(e)}
+ renderSettingsControls();
+}
+
+function resetHQSettings(){
+ if(!confirm('Reset your appearance settings to the original Midnight theme?'))return;
+ hqSettings={...DEFAULT_SETTINGS};
+ applyTheme();
+ showBackground();
+ saveHQSettings();
+ renderSettingsControls();
+}
+
+function renderSettingsControls(){
+ const host=document.getElementById('settingsControls');
+ if(!host)return;
+
+ host.innerHTML=`
+ <div class="settings-section">
+  <h3>Choose a built-in theme</h3>
+  <div class="settings-grid">
+   ${Object.keys(THEMES).map(t=>`
+    <button class="btn ${hqSettings.theme===t?'primary':''}" onclick="changeTheme('${t}')">
+     ${t.charAt(0).toUpperCase()+t.slice(1)}
+    </button>
+   `).join('')}
+  </div>
+ </div>
+
+ <div class="settings-section">
+  <h3>Custom colours</h3>
+  <div class="settings-grid">
+   ${[
+    ['bg','Background'],
+    ['panel','Panels'],
+    ['panel2','Secondary panels'],
+    ['line','Borders'],
+    ['text','Main text'],
+    ['muted','Muted text'],
+    ['accent','Accent colour']
+   ].map(([key,label])=>`
+    <label class="form-field">
+     <span>${label}</span>
+     <div class="color-control">
+      <input type="color" value="${esc(hqSettings[key]||DEFAULT_SETTINGS[key])}" oninput="updateSetting('${key}',this.value)">
+      <span class="muted">${esc(hqSettings[key]||DEFAULT_SETTINGS[key])}</span>
+     </div>
+    </label>
+   `).join('')}
+  </div>
+ </div>
+
+ <div class="settings-section">
+  <h3>Typography</h3>
+  <label class="form-field">
+   <span>Website font</span>
+   <select onchange="updateSetting('font',this.value)">
+    ${['Inter','Georgia','Arial','Verdana','Trebuchet MS','Courier New'].map(f=>`
+     <option value="${esc(f)}" ${hqSettings.font===f?'selected':''}>${esc(f)}</option>
+    `).join('')}
+   </select>
+  </label>
+ </div>
+
+ <div class="settings-section">
+  <h3>Background image</h3>
+  <p class="muted">Upload a background image for your HQ. It is stored privately in your account.</p>
+  <div class="toolbar">
+   <button class="btn primary" onclick="document.getElementById('hqBackgroundFile').click()">↑ Upload background</button>
+   <button class="btn danger" onclick="removeHQBackground()" ${hqSettings.backgroundPath?'':'disabled'}>Remove image</button>
+  </div>
+  <div class="settings-grid" style="margin-top:14px">
+   <label class="form-field">
+    <span>Image sizing</span>
+    <select onchange="updateSetting('fit',this.value)">
+     <option value="cover" ${hqSettings.fit==='cover'?'selected':''}>Fill screen</option>
+     <option value="contain" ${hqSettings.fit==='contain'?'selected':''}>Fit entire image</option>
+     <option value="auto" ${hqSettings.fit==='auto'?'selected':''}>Original size</option>
+    </select>
+   </label>
+   <label class="form-field">
+    <span>Image position</span>
+    <select onchange="updateSetting('position',this.value)">
+     ${['center','top','bottom','left','right','top left','top right','bottom left','bottom right'].map(p=>`
+      <option value="${p}" ${hqSettings.position===p?'selected':''}>${p}</option>
+     `).join('')}
+    </select>
+   </label>
+  </div>
+  <label class="form-field" style="margin-top:14px">
+   <span>Darkness overlay: <strong id="overlayValue">${hqSettings.overlay}%</strong></span>
+   <div class="range-row">
+    <input type="range" min="0" max="90" value="${hqSettings.overlay}" oninput="document.getElementById('overlayValue').textContent=this.value+'%';updateSetting('overlay',Number(this.value))">
+   </div>
+  </label>
+  <label class="form-field" style="margin-top:14px">
+   <span>Background blur: <strong id="blurValue">${hqSettings.blur}px</strong></span>
+   <div class="range-row">
+    <input type="range" min="0" max="20" value="${hqSettings.blur}" oninput="document.getElementById('blurValue').textContent=this.value+'px';updateSetting('blur',Number(this.value))">
+   </div>
+  </label>
+ </div>
+
+ <div class="settings-section">
+  <h3>Preview</h3>
+  <div class="preview-box">Your universe. Your atmosphere.</div>
+ </div>
+
+ <button class="btn danger" onclick="resetHQSettings()">Reset all appearance settings</button>
+ `;
+}
+
+document.getElementById('hqBackgroundFile').addEventListener('change',e=>{
+ const file=e.target.files?.[0];
+ if(file)uploadHQBackground(file);
+ e.target.value='';
+});
 
 /* AUTHENTICATION */
 
@@ -326,18 +698,15 @@ function showAuthMessage(message,type=''){
  el.className='auth-message '+type;
  el.style.display='block';
 }
-
 function clearAuthMessage(){
  const el=document.getElementById('authMessage');
  el.textContent='';
  el.style.display='none';
 }
-
 function showAuth(){
  document.getElementById('authScreen').style.display='flex';
  document.getElementById('appShell').style.display='none';
 }
-
 function showApp(){
  document.getElementById('authScreen').style.display='none';
  document.getElementById('appShell').style.display='grid';
@@ -347,49 +716,28 @@ function showApp(){
 
 document.getElementById('switchAuth').addEventListener('click',()=>{
  authMode=authMode==='signin'?'signup':'signin';
- document.getElementById('authSubmit').textContent=
-  authMode==='signin'?'Sign in':'Create account';
- document.getElementById('switchAuth').textContent=
-  authMode==='signin'?'Create a new account':'Back to sign in';
- document.getElementById('authPassword').autocomplete=
-  authMode==='signin'?'current-password':'new-password';
+ document.getElementById('authSubmit').textContent=authMode==='signin'?'Sign in':'Create account';
+ document.getElementById('switchAuth').textContent=authMode==='signin'?'Create a new account':'Back to sign in';
+ document.getElementById('authPassword').autocomplete=authMode==='signin'?'current-password':'new-password';
  clearAuthMessage();
 });
 
 document.getElementById('authForm').addEventListener('submit',async e=>{
  e.preventDefault();
  clearAuthMessage();
-
  const email=document.getElementById('authEmail').value.trim();
  const password=document.getElementById('authPassword').value;
  const submit=document.getElementById('authSubmit');
-
- submit.disabled=true;
- submit.textContent='Please wait...';
+ submit.disabled=true;submit.textContent='Please wait...';
 
  try{
   if(authMode==='signup'){
-   const {data,error}=await supabaseClient.auth.signUp({
-    email,
-    password
-   });
-
+   const {data,error}=await supabaseClient.auth.signUp({email,password});
    if(error)throw error;
-
-   if(data.session){
-    await startUserSession(data.session.user);
-   }else{
-    showAuthMessage(
-     'Your account has been created. Check your email for a confirmation link. Once confirmed, return here and sign in.',
-     'success'
-    );
-   }
+   if(data.session)await startUserSession(data.session.user);
+   else showAuthMessage('Your account has been created. Check your email for a confirmation link. Once confirmed, return here and sign in.','success');
   }else{
-   const {data,error}=await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-   });
-
+   const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
    if(error)throw error;
    await startUserSession(data.user);
   }
@@ -403,156 +751,90 @@ document.getElementById('authForm').addEventListener('submit',async e=>{
 
 document.getElementById('resetPassword').addEventListener('click',async()=>{
  const email=document.getElementById('authEmail').value.trim();
-
- if(!email){
-  showAuthMessage('Enter your email address first, then choose Forgot password.','error');
-  return;
- }
-
+ if(!email){showAuthMessage('Enter your email address first, then choose Forgot password.','error');return}
  try{
   const {error}=await supabaseClient.auth.resetPasswordForEmail(email);
   if(error)throw error;
   showAuthMessage('If the address is registered, a password reset email will be sent.','success');
- }catch(error){
-  showAuthMessage(error.message||'Could not request a password reset.','error');
- }
+ }catch(error){showAuthMessage(error.message||'Could not request a password reset.','error')}
 });
 
 async function signOut(){
  if(!confirm('Sign out of Character Universe HQ?'))return;
-
  cloudReady=false;
-
- try{
-  await supabaseClient.auth.signOut();
- }catch(error){
-  alert('There was a problem signing out: '+error.message);
- }
+ try{await supabaseClient.auth.signOut()}
+ catch(error){alert('There was a problem signing out: '+error.message)}
 }
 
-supabaseClient.auth.onAuthStateChange((event,session)=>{
+supabaseClient.auth.onAuthStateChange((event)=>{
  if(event==='SIGNED_OUT'){
-  currentUser=null;
-  cloudReady=false;
-  cloudRowIds={};
-  cloudKnownIds={};
-  showAuth();
+  currentUser=null;cloudReady=false;
+  cloudRowIds={};cloudKnownIds={};
+  hqSettings={...DEFAULT_SETTINGS};
+  applyTheme();showBackground();showAuth();
  }
 });
 
-/*
- IMPORTANT:
- cloudReady is set BEFORE loadCloudData().
- This allows the first cloud load to upload existing browser
- entries and create the cloud-initialized marker.
-*/
-
-async function startUserSession(user){
- currentUser=user;
- cloudReady=true;
-
- setSyncStatus('☁ Loading archive...');
- showApp();
-
- try{
-  await loadCloudData();
-  render();
-  setSyncStatus('☁ Cloud synced');
- }catch(error){
-  cloudReady=false;
-  setSyncStatus('Cloud error',true);
-  alert(
-   'Your account is signed in, but the cloud archive could not be loaded.\n\n'+
-   error.message+
-   '\n\nCheck that your archive_entries table and its permissions are set up correctly.'
-  );
- }
-}
-
-/* CLOUD DATABASE */
+/* CLOUD ARCHIVE */
 
 function hasLocalEntries(data){
  return Object.keys(blank).some(k=>(data[k]||[]).length>0);
 }
-
 function mergeArchives(local,remote){
  const merged=freshBlank();
-
  Object.keys(blank).forEach(kind=>{
   const map=new Map();
-
   (remote[kind]||[]).forEach(item=>map.set(String(item.id),item));
   (local[kind]||[]).forEach(item=>map.set(String(item.id),item));
-
   merged[kind]=Array.from(map.values());
  });
-
  return merged;
 }
 
-/*
- The marker tells the app that the cloud archive has been
- initialized. Once it exists, cloud data is authoritative.
-
- This prevents an old browser copy from restoring entries
- that were deleted on another device.
-*/
-
 async function loadCloudData(){
- const {data:rows,error}=await supabaseClient
-  .from('archive_entries')
+ const {data:rows,error}=await supabaseClient.from('archive_entries')
   .select('id,user_id,kind,entry_key,data,created_at,updated_at');
-
  if(error)throw error;
 
  const remote=freshBlank();
+ cloudRowIds={};cloudKnownIds={};
+ Object.keys(blank).forEach(k=>{cloudRowIds[k]={};cloudKnownIds[k]=[]});
 
- cloudRowIds={};
- cloudKnownIds={};
-
- Object.keys(blank).forEach(k=>{
-  cloudRowIds[k]={};
-  cloudKnownIds[k]=[];
- });
-
- const cloudInitialized=(rows||[]).some(row=>
-  row.entry_key===CLOUD_MARKER
- );
+ let cloudSettings=null;
+ const cloudInitialized=(rows||[]).some(row=>row.entry_key===CLOUD_MARKER);
 
  (rows||[]).forEach(row=>{
   if(row.entry_key===CLOUD_MARKER)return;
+  if(row.entry_key===SETTINGS_KEY){
+   cloudSettings=row.data||null;
+   return;
+  }
   if(!blank[row.kind]||!row.data)return;
 
-  const item={
-   ...row.data,
-   id:row.entry_key||row.data.id
-  };
-
+  const item={...row.data,id:row.entry_key||row.data.id};
   remote[row.kind].push(item);
   cloudRowIds[row.kind][String(item.id)]=row.id;
   cloudKnownIds[row.kind].push(String(item.id));
  });
 
- const local=load();
+ if(cloudInitialized)db=remote;
+ else db=mergeArchives(load(),remote);
 
- if(cloudInitialized){
-  // Cloud is now the single source of truth.
-  db=remote;
+ if(cloudSettings){
+  hqSettings={...DEFAULT_SETTINGS,...cloudSettings};
  }else{
-  // First setup only: preserve existing browser entries.
-  db=mergeArchives(local,remote);
+  hqSettings={...DEFAULT_SETTINGS};
  }
 
  localStorage.setItem(KEY,JSON.stringify(db));
+ applyTheme();
+ await showBackground();
 
- // Upload first-time browser entries and create the marker.
  await syncCloud();
+ if(!cloudSettings&&cloudInitialized){
+  await saveHQSettings();
+ }
 }
-
-/*
- A failed sync no longer poisons the queue.
- Later saves can still run after a previous sync error.
-*/
 
 async function syncCloud(){
  if(!currentUser||!cloudReady)return;
@@ -564,69 +846,40 @@ async function syncCloud(){
   for(const kind of Object.keys(blank)){
    const entries=snapshot[kind]||[];
    const currentIds=entries.map(x=>String(x.id));
-
-   // Delete records that have been removed from this archive.
    const oldIds=cloudKnownIds[kind]||[];
 
    for(const oldId of oldIds){
     if(!currentIds.includes(String(oldId))){
-     const {error}=await supabaseClient
-      .from('archive_entries')
-      .delete()
-      .eq('user_id',userId)
-      .eq('kind',kind)
-      .eq('entry_key',String(oldId));
-
+     const {error}=await supabaseClient.from('archive_entries').delete()
+      .eq('user_id',userId).eq('kind',kind).eq('entry_key',String(oldId));
      if(error)throw error;
-
      delete cloudRowIds[kind][oldId];
     }
    }
 
-   // Save all current records.
    for(const item of entries){
     const entryId=String(item.id);
-
     const row={
      id:cloudRowIds[kind][entryId]||crypto.randomUUID(),
-     user_id:userId,
-     kind,
-     entry_key:entryId,
-     data:item,
+     user_id:userId,kind,entry_key:entryId,data:item,
      updated_at:new Date().toISOString()
     };
-
-    const {error}=await supabaseClient
-     .from('archive_entries')
-     .upsert(row,{
-      onConflict:'user_id,kind,entry_key'
-     });
-
+    const {error}=await supabaseClient.from('archive_entries').upsert(row,{
+     onConflict:'user_id,kind,entry_key'
+    });
     if(error)throw error;
-
     cloudRowIds[kind][entryId]=row.id;
    }
-
    cloudKnownIds[kind]=currentIds;
   }
 
-  // Save a hidden marker so other devices know the cloud
-  // archive has already been initialized.
-  const {error:markerError}=await supabaseClient
-   .from('archive_entries')
-   .upsert({
-    id:crypto.randomUUID(),
-    user_id:userId,
-    kind:'events',
-    entry_key:CLOUD_MARKER,
-    data:{id:CLOUD_MARKER,system:true},
-    updated_at:new Date().toISOString()
-   },{
-    onConflict:'user_id,kind,entry_key'
-   });
+  const {error:markerError}=await supabaseClient.from('archive_entries').upsert({
+   id:crypto.randomUUID(),user_id:userId,kind:'events',
+   entry_key:CLOUD_MARKER,data:{id:CLOUD_MARKER,system:true},
+   updated_at:new Date().toISOString()
+  },{onConflict:'user_id,kind,entry_key'});
 
   if(markerError)throw markerError;
-
   setSyncStatus('☁ Cloud synced');
  });
 
@@ -635,60 +888,54 @@ async function syncCloud(){
   console.error('Cloud sync error:',error);
   throw error;
  });
-
  return syncQueue;
 }
 
-/* REFRESH CLOUD WHEN RETURNING TO THE WEBSITE */
-
 async function refreshCloudArchive(){
  if(!currentUser||!cloudReady||refreshingCloud)return;
-
- // Avoid unnecessary repeated refreshes from focus and visibility events.
  if(Date.now()-lastCloudRefresh<3000)return;
-
- refreshingCloud=true;
- lastCloudRefresh=Date.now();
+ refreshingCloud=true;lastCloudRefresh=Date.now();
 
  try{
   setSyncStatus('☁ Checking for updates...');
-
-  // Let any pending save finish before replacing local data.
   await syncQueue.catch(()=>{});
-
   await loadCloudData();
-
   render();
   setSyncStatus('☁ Cloud synced');
  }catch(error){
   console.error('Cloud refresh error:',error);
   setSyncStatus('Refresh failed',true);
- }finally{
-  refreshingCloud=false;
- }
+ }finally{refreshingCloud=false}
 }
 
 document.addEventListener('visibilitychange',()=>{
- if(document.visibilityState==='visible'){
-  refreshCloudArchive();
- }
+ if(document.visibilityState==='visible')refreshCloudArchive();
 });
-
 window.addEventListener('focus',refreshCloudArchive);
 
-/* SAVE */
+async function startUserSession(user){
+ currentUser=user;cloudReady=true;
+ setSyncStatus('☁ Loading archive...');
+ showApp();
+
+ try{
+  await loadCloudData();
+  render();
+  setSyncStatus('☁ Cloud synced');
+ }catch(error){
+  cloudReady=false;setSyncStatus('Cloud error',true);
+  alert('Your account is signed in, but the cloud archive could not be loaded.\n\n'+error.message);
+ }
+}
 
 function save(){
  try{
   localStorage.setItem(KEY,JSON.stringify(db));
   render();
-
   if(cloudReady){
    setSyncStatus('☁ Saving...');
-
    syncCloud().catch(error=>{
-    console.error(error);
-    setSyncStatus('Sync failed',true);
+    console.error(error);setSyncStatus('Sync failed',true);
    });
   }
  }catch(e){
@@ -700,112 +947,73 @@ function save(){
 
 const configs={
  characters:{
-  title:'Characters',
-  sub:'The people who make your universes breathe.',
-  singular:'character',
+  title:'Characters',sub:'The people who make your universes breathe.',singular:'character',
   fields:[
-   ['name','Full name','text',true],
-   ['age','Current age','text'],
-   ['birthDate','Birth date','date'],
-   ['deathDate','Death date','date'],
-   ['pronouns','Pronouns','text'],
-   ['universe','Universe','universe-name'],
-   ['species','Species','text'],
-   ['portrait','Portrait image URL','url'],
-   ['appearance','Appearance','textarea'],
-   ['personality','Personality','textarea'],
-   ['backstory','Backstory','textarea'],
-   ['secrets','Secrets / notes','textarea']
+   ['name','Full name','text',true],['age','Current age','text'],
+   ['birthDate','Birth date','date'],['deathDate','Death date','date'],
+   ['pronouns','Pronouns','text'],['universe','Universe','universe-name'],
+   ['species','Species','text'],['portrait','Portrait image URL','url'],
+   ['appearance','Appearance','textarea'],['personality','Personality','textarea'],
+   ['backstory','Backstory','textarea'],['secrets','Secrets / notes','textarea']
   ]
  },
  universes:{
-  title:'Universes',
-  sub:'Keep each world and its rules in one place.',
-  singular:'universe',
+  title:'Universes',sub:'Keep each world and its rules in one place.',singular:'universe',
   fields:[
-   ['name','Universe name','text',true],
-   ['genre','Genre','text'],
+   ['name','Universe name','text',true],['genre','Genre','text'],
    ['foundedDate','Creation / founding date','date'],
-   ['description','Description','textarea'],
-   ['mainWorld','Main world','text'],
+   ['description','Description','textarea'],['mainWorld','Main world','text'],
    ['notes','Rules / extra notes','textarea']
   ]
  },
  locations:{
-  title:'World Atlas',
-  sub:'An interactive map of your worlds, cities and important places.',
-  singular:'location',
+  title:'World Atlas',sub:'An interactive map of your worlds, cities and important places.',singular:'location',
   fields:[
    ['name','Place name','text',true],
    ['type','Location type','select',['World','Planet','Country','Kingdom','Region','City','District','Village','Building','Landmark','Ruins','Hideout','Other']],
-   ['universe','Universe','universe-name'],
-   ['parent','Part of / parent location','text'],
+   ['universe','Universe','universe-name'],['parent','Part of / parent location','text'],
    ['establishedDate','Built / founded date','date'],
    ['latitude','Map vertical position (0–100)','number'],
    ['longitude','Map horizontal position (0–100)','number'],
-   ['image','Image URL','url'],
-   ['government','Government','text'],
-   ['culture','Culture / language','text'],
-   ['population','Population','text'],
-   ['description','Description','textarea'],
-   ['history','History','textarea']
+   ['image','Image URL','url'],['government','Government','text'],
+   ['culture','Culture / language','text'],['population','Population','text'],
+   ['description','Description','textarea'],['history','History','textarea']
   ]
  },
  relationships:{
-  title:'Relationships',
-  sub:'Connect existing characters and record how they know each other.',
-  singular:'connection',
+  title:'Relationships',sub:'Connect existing characters and record how they know each other.',singular:'connection',
   fields:[
    ['characterA','First character','character',true],
    ['characterB','Second character','character',true],
    ['type','Relationship type','select',['Parent','Child','Sibling','Grandparent','Grandchild','Aunt / uncle','Niece / nephew','Cousin','Adoptive parent','Adopted child','Other family','Partner','Spouse','Ex-partner','Friend','Best friend','Acquaintance','Rival','Enemy','Colleague','Mentor','Other']],
-   ['startDate','Relationship began','date'],
-   ['endDate','Relationship ended','date'],
-   ['status','Current status','text'],
-   ['howMet','How they met','textarea'],
-   ['history','Relationship history','textarea'],
-   ['notes','Extra notes','textarea']
+   ['startDate','Relationship began','date'],['endDate','Relationship ended','date'],
+   ['status','Current status','text'],['howMet','How they met','textarea'],
+   ['history','Relationship history','textarea'],['notes','Extra notes','textarea']
   ]
  },
  groups:{
-  title:'Groups & factions',
-  sub:'Organisations, teams, societies and secretive institutions.',
-  singular:'group',
+  title:'Groups & factions',sub:'Organisations, teams, societies and secretive institutions.',singular:'group',
   fields:[
-   ['name','Group name','text',true],
-   ['type','Group type','text'],
-   ['foundedDate','Founded date','date'],
-   ['leader','Leader','text'],
-   ['headquarters','Headquarters','text'],
-   ['universe','Universe','universe-name'],
-   ['purpose','Purpose','textarea'],
-   ['history','History','textarea'],
-   ['members','Members','textarea']
+   ['name','Group name','text',true],['type','Group type','text'],
+   ['foundedDate','Founded date','date'],['leader','Leader','text'],
+   ['headquarters','Headquarters','text'],['universe','Universe','universe-name'],
+   ['purpose','Purpose','textarea'],['history','History','textarea'],['members','Members','textarea']
   ]
  },
  events:{
-  title:'Timeline',
-  sub:'A chronological history of events across your worlds.',
-  singular:'event',
+  title:'Timeline',sub:'A chronological history of events across your worlds.',singular:'event',
   fields:[
-   ['name','Event name','text',true],
-   ['date','Event date','date',true],
-   ['universe','Universe','universe-name'],
-   ['location','Location','location'],
+   ['name','Event name','text',true],['date','Event date','date',true],
+   ['universe','Universe','universe-name'],['location','Location','location'],
    ['characters','Characters involved','multi-character'],
-   ['description','What happened','textarea'],
-   ['consequences','Consequences','textarea']
+   ['description','What happened','textarea'],['consequences','Consequences','textarea']
   ]
  },
  links:{
-  title:'Link Library',
-  sub:'Keep research, references and inspiration separate from your lore.',
-  singular:'link',
+  title:'Link Library',sub:'Keep research, references and inspiration separate from your lore.',singular:'link',
   fields:[
-   ['name','Link title','text',true],
-   ['url','URL','url',true],
-   ['category','Category','text'],
-   ['savedDate','Date saved / relevant date','date'],
+   ['name','Link title','text',true],['url','URL','url',true],
+   ['category','Category','text'],['savedDate','Date saved / relevant date','date'],
    ['notes','Why you saved it','textarea']
   ]
  }
@@ -818,19 +1026,16 @@ const pageTitles={
  backup:['Your archive','Keep a portable copy of everything you create.']
 };
 
-/* NAVIGATION AND RENDERING */
+/* NAVIGATION */
 
 function setPage(p){
  if(!configs[p]&&!pageTitles[p])return;
  page=p;
-
  document.querySelectorAll('nav button').forEach(b=>{
   b.classList.toggle('active',b.dataset.page===p);
  });
-
  render();
 }
-
 document.getElementById('nav').addEventListener('click',e=>{
  const b=e.target.closest('button[data-page]');
  if(b)setPage(b.dataset.page);
@@ -843,15 +1048,12 @@ function counts(){
 function render(){
  const c=configs[page];
  const title=pageTitles[page]||[c.title,c.sub];
-
  document.getElementById('pageTitle').textContent=title[0];
  document.getElementById('pageSub').textContent=title[1];
  document.getElementById('eyebrow').textContent=
   page==='dashboard'?'Your creative archive':
   page==='backup'?'Archive tools':'Character Universe HQ';
-
- document.getElementById('topActions').style.display=
-  page==='backup'?'none':'flex';
+ document.getElementById('topActions').style.display=page==='backup'?'none':'flex';
 
  if(page==='dashboard')dashboard();
  else if(page==='backup')backup();
@@ -866,7 +1068,6 @@ function render(){
 function dashboard(){
  const n=counts();
  const total=Object.values(n).reduce((a,b)=>a+b,0);
-
  document.getElementById('content').innerHTML=`
  <div class="stats">
   <div class="stat"><span>♙ Characters</span><strong>${n.characters}</strong></div>
@@ -874,61 +1075,40 @@ function dashboard(){
   <div class="stat"><span>◷ Timeline entries</span><strong>${timelineItems().length}</strong></div>
   <div class="stat"><span>↗ Saved links</span><strong>${n.links}</strong></div>
  </div>
- <div class="section-head">
-  <h2>Recently added</h2>
-  <span class="muted">${total} total entries</span>
- </div>
+ <div class="section-head"><h2>Recently added</h2><span class="muted">${total} total entries</span></div>
  <div class="grid">${recentCards()}</div>
  <div class="section-head"><h2>Your archive, your rules</h2></div>
  <div class="grid">
- ${[
-  ['01 · People','Character dossiers','Build detailed profiles and keep track of every important person.','characters'],
-  ['02 · Connections','Family tree','See how characters connect through family and relationships.','familytree'],
-  ['03 · History','Living timeline','Every dated entry appears in chronological order.','timeline'],
-  ['04 · Geography','World Atlas','Explore your worlds through an interactive map.','locations']
- ].map(x=>`
-  <div class="card">
-   <span class="tag">${x[0]}</span>
-   <h3>${x[1]}</h3>
-   <p>${x[2]}</p>
-   <button class="btn small" onclick="setPage('${x[3]}')">Open →</button>
-  </div>
- `).join('')}
+  ${[
+   ['01 · People','Character dossiers','Build detailed profiles and keep track of every important person.','characters'],
+   ['02 · Connections','Family tree','See how characters connect through family and relationships.','familytree'],
+   ['03 · History','Living timeline','Every dated entry appears in chronological order.','timeline'],
+   ['04 · Geography','World Atlas','Explore your worlds through an interactive map.','locations']
+  ].map(x=>`
+   <div class="card"><span class="tag">${x[0]}</span><h3>${x[1]}</h3><p>${x[2]}</p><button class="btn small" onclick="setPage('${x[3]}')">Open →</button></div>
+  `).join('')}
  </div>`;
 }
 
 function recentCards(){
  let all=[];
-
- Object.keys(configs).forEach(k=>{
-  db[k].forEach(x=>all.push({...x,_kind:k}));
- });
-
+ Object.keys(configs).forEach(k=>db[k].forEach(x=>all.push({...x,_kind:k})));
  all.sort((a,b)=>(b.updated||b.created||0)-(a.updated||a.created||0));
-
- if(!all.length){
-  return '<div class="empty">Your archive is waiting for its first entry.</div>';
- }
-
+ if(!all.length)return '<div class="empty">Your archive is waiting for its first entry.</div>';
  return all.slice(0,3).map(x=>`
   <div class="card">
    <span class="tag">${configs[x._kind].singular}</span>
    <h3>${esc(x.name||characterName(x.characterA)+' & '+characterName(x.characterB))}</h3>
    <p>${esc(x.description||x.personality||x.date||x.type||'Added to your archive')}</p>
-   <div class="card-foot">
-    <span class="muted">Recently added</span>
-    <button class="btn small" onclick="setPage('${x._kind}')">View →</button>
-   </div>
+   <div class="card-foot"><span class="muted">Recently added</span><button class="btn small" onclick="setPage('${x._kind}')">View →</button></div>
   </div>
  `).join('');
 }
 
-/* CATEGORY LISTS AND CARDS */
+/* CATEGORY CARDS */
 
 function listPage(k){
- const c=configs[k];
- const arr=db[k]||[];
-
+ const c=configs[k],arr=db[k]||[];
  document.getElementById('content').innerHTML=`
  <div class="toolbar">
   <input class="field search" id="search" placeholder="Search ${c.title.toLowerCase()}..." oninput="filterCards()">
@@ -941,134 +1121,69 @@ function listPage(k){
 
 function card(k,x){
  const title=x.name||(characterName(x.characterA)+' & '+characterName(x.characterB));
-
  let summary=x.description||x.personality||x.purpose||x.howMet||x.notes||x.backstory||x.date||'No description added yet.';
-
  const meta=k==='events'?x.date:
   k==='characters'?[x.age&&'Age '+x.age,x.pronouns,x.universe].filter(Boolean).join(' · '):
-  k==='relationships'?x.type:
-  k==='links'?x.category:
-  x.type||x.universe||'';
-
- const link=k==='links'&&x.url?
-  `<a class="link" href="${esc(x.url)}" target="_blank" rel="noopener">Open reference ↗</a>`:'';
-
- if(k==='relationships'){
-  summary=characterName(x.characterA)+' and '+characterName(x.characterB)+'. '+(x.howMet||'');
- }
-
+  k==='relationships'?x.type:k==='links'?x.category:x.type||x.universe||'';
+ const link=k==='links'&&x.url?`<a class="link" href="${esc(x.url)}" target="_blank" rel="noopener">Open reference ↗</a>`:'';
+ if(k==='relationships')summary=characterName(x.characterA)+' and '+characterName(x.characterB)+'. '+(x.howMet||'');
  if(k==='events')summary=x.description||'No description added yet.';
-
  return `
  <article class="card" data-search="${esc(JSON.stringify(x).toLowerCase())}">
-  <div class="card-top">
-   <span class="tag">${esc(meta||configs[k].singular)}</span>
+  <div class="card-top"><span class="tag">${esc(meta||configs[k].singular)}</span>
    ${x.portrait?`<img class="portrait" src="${esc(x.portrait)}" alt="">`:'<span class="muted">✧</span>'}
   </div>
-  <h3>${esc(title)}</h3>
-  <p>${esc(summary).slice(0,190)}${summary.length>190?'…':''}</p>
+  <h3>${esc(title)}</h3><p>${esc(summary).slice(0,190)}${summary.length>190?'…':''}</p>
   ${link}
-  <div class="card-foot">
-   <span class="muted">${esc(x.universe||x.location||x.status||'Archive entry')}</span>
-   <span>
-    <button class="btn small" onclick="editEntry('${k}','${x.id}')">Edit</button>
-    <button class="btn small danger" onclick="deleteEntry('${k}','${x.id}')">Delete</button>
-   </span>
+  <div class="card-foot"><span class="muted">${esc(x.universe||x.location||x.status||'Archive entry')}</span>
+   <span><button class="btn small" onclick="editEntry('${k}','${x.id}')">Edit</button>
+   <button class="btn small danger" onclick="deleteEntry('${k}','${x.id}')">Delete</button></span>
   </div>
  </article>`;
 }
-
 function filterCards(){
  const input=document.getElementById('search');
  if(!input)return;
-
  const q=input.value.toLowerCase();
-
  document.querySelectorAll('#cards article').forEach(el=>{
   el.style.display=el.dataset.search.includes(q)?'':'none';
  });
 }
 
-/* CREATE AND EDIT FORMS */
+/* ENTRY FORMS */
 
 function openCreate(k=page){
  if(!configs[k])k='characters';
  editing={kind:k,id:null};
  showForm(k,{});
 }
-
 function editEntry(k,i){
  const x=db[k]?.find(y=>y.id===i);
- if(x){
-  editing={kind:k,id:i};
-  showForm(k,x);
- }
+ if(x){editing={kind:k,id:i};showForm(k,x)}
 }
-
 function showForm(k,x){
  const c=configs[k];
-
- document.getElementById('modalTitle').textContent=
-  (editing.id?'Edit ':'Add ')+c.singular;
-
+ document.getElementById('modalTitle').textContent=(editing.id?'Edit ':'Add ')+c.singular;
  document.getElementById('formFields').innerHTML=c.fields.map(f=>{
   const [key,label,type,extra]=f;
   const val=x[key]??'';
   let inp='';
 
-  if(type==='textarea'){
-   inp=`<textarea name="${key}" ${extra===true?'required':''}>${esc(val)}</textarea>`;
-  }
-  else if(type==='character'){
-   inp=`<select name="${key}" required>
-    <option value="">Choose a character</option>
-    ${db.characters.map(ch=>`
-     <option value="${esc(ch.id)}" ${val===ch.id?'selected':''}>${esc(ch.name)}</option>
-    `).join('')}
-   </select>`;
-  }
+  if(type==='textarea')inp=`<textarea name="${key}" ${extra===true?'required':''}>${esc(val)}</textarea>`;
+  else if(type==='character')inp=`<select name="${key}" required><option value="">Choose a character</option>${db.characters.map(ch=>`<option value="${esc(ch.id)}" ${val===ch.id?'selected':''}>${esc(ch.name)}</option>`).join('')}</select>`;
   else if(type==='multi-character'){
    const selected=Array.isArray(val)?val:[];
-   inp=`<select name="${key}" multiple style="min-height:125px">
-    ${db.characters.map(ch=>`
-     <option value="${esc(ch.id)}" ${selected.includes(ch.id)?'selected':''}>${esc(ch.name)}</option>
-    `).join('')}
-   </select>
-   <small class="muted">Hold Ctrl or Command to select multiple characters.</small>`;
+   inp=`<select name="${key}" multiple style="min-height:125px">${db.characters.map(ch=>`<option value="${esc(ch.id)}" ${selected.includes(ch.id)?'selected':''}>${esc(ch.name)}</option>`).join('')}</select><small class="muted">Hold Ctrl or Command to select multiple characters.</small>`;
   }
-  else if(type==='location'){
-   inp=`<select name="${key}">
-    <option value="">Choose a location</option>
-    ${db.locations.map(l=>`
-     <option value="${esc(l.id)}" ${val===l.id?'selected':''}>${esc(l.name)}</option>
-    `).join('')}
-   </select>`;
-  }
-  else if(type==='universe-name'){
-   inp=`<input class="field" name="${key}" list="universeOptions" value="${esc(val)}" placeholder="Enter or choose a universe">
-   <datalist id="universeOptions">
-    ${universeNames().map(u=>`<option value="${esc(u)}">`).join('')}
-   </datalist>`;
-  }
-  else if(type==='select'){
-   inp=`<select name="${key}">
-    ${extra.map(v=>`<option value="${esc(v)}" ${val===v?'selected':''}>${esc(v)}</option>`).join('')}
-   </select>`;
-  }
-  else{
-   inp=`<input class="field" type="${type}" name="${key}" value="${esc(val)}" ${extra===true?'required':''}>`;
-  }
+  else if(type==='location')inp=`<select name="${key}"><option value="">Choose a location</option>${db.locations.map(l=>`<option value="${esc(l.id)}" ${val===l.id?'selected':''}>${esc(l.name)}</option>`).join('')}</select>`;
+  else if(type==='universe-name')inp=`<input class="field" name="${key}" list="universeOptions" value="${esc(val)}" placeholder="Enter or choose a universe"><datalist id="universeOptions">${universeNames().map(u=>`<option value="${esc(u)}">`).join('')}</datalist>`;
+  else if(type==='select')inp=`<select name="${key}">${extra.map(v=>`<option value="${esc(v)}" ${val===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`;
+  else inp=`<input class="field" type="${type}" name="${key}" value="${esc(val)}" ${extra===true?'required':''}>`;
 
-  return `
-   <div class="form-field ${['textarea','multi-character'].includes(type)?'full':''}">
-    <label>${label}${extra===true?' *':''}</label>
-    ${inp}
-   </div>`;
+  return `<div class="form-field ${['textarea','multi-character'].includes(type)?'full':''}"><label>${label}${extra===true?' *':''}</label>${inp}</div>`;
  }).join('');
-
  document.getElementById('modalWrap').classList.add('open');
 }
-
 function closeModal(){
  document.getElementById('modalWrap').classList.remove('open');
  editing=null;
@@ -1077,53 +1192,33 @@ function closeModal(){
 document.getElementById('entryForm').addEventListener('submit',e=>{
  e.preventDefault();
  if(!editing)return;
-
- const k=editing.kind;
- const fd=new FormData(e.target);
+ const k=editing.kind,fd=new FormData(e.target);
  const obj=Object.fromEntries(fd.entries());
-
  if(k==='events')obj.characters=fd.getAll('characters');
- if(k==='characters'&&obj.age==='')obj.age='';
-
  obj.id=editing.id||id();
-
  const existing=db[k].find(x=>x.id===editing.id);
-
  obj.created=existing?.created||Date.now();
  obj.updated=Date.now();
-
  const idx=db[k].findIndex(x=>x.id===obj.id);
-
- if(idx>=0)db[k][idx]=obj;
- else db[k].unshift(obj);
-
- closeModal();
- save();
+ if(idx>=0)db[k][idx]=obj;else db[k].unshift(obj);
+ closeModal();save();
 });
 
-/* DELETE ENTRIES */
+/* DELETE */
 
 function deleteEntry(k,i){
  const item=db[k]?.find(x=>x.id===i);
  if(!item)return;
-
  const name=item.name||characterName(item.characterA)+' & '+characterName(item.characterB);
-
  if(!confirm(`Delete "${name}"? This cannot be undone.`))return;
-
  db[k]=db[k].filter(x=>x.id!==i);
 
  if(k==='characters'){
   db.relationships=db.relationships.filter(r=>r.characterA!==i&&r.characterB!==i);
-  db.events=db.events.map(ev=>({
-   ...ev,
-   characters:(ev.characters||[]).filter(cid=>cid!==i)
-  }));
+  db.events=db.events.map(ev=>({...ev,characters:(ev.characters||[]).filter(cid=>cid!==i)}));
  }
-
  if(k==='universes'){
   const universeName=item.name;
-
   if(universeName){
    db.characters=db.characters.map(x=>x.universe===universeName?{...x,universe:''}:x);
    db.locations=db.locations.map(x=>x.universe===universeName?{...x,universe:''}:x);
@@ -1131,37 +1226,24 @@ function deleteEntry(k,i){
    db.events=db.events.map(x=>x.universe===universeName?{...x,universe:''}:x);
   }
  }
-
  if(k==='locations'){
   db.events=db.events.map(ev=>ev.location===i?{...ev,location:''}:ev);
   if(selectedLocation===i)selectedLocation=null;
  }
-
  save();
 }
 
-/* UNIVERSAL TIMELINE */
+/* TIMELINE */
 
 function timelineItems(){
  const items=[];
-
  function add(kind,arr,dateField,label,descriptionField){
   arr.forEach(x=>{
    if(!x[dateField])return;
-
-   items.push({
-    id:x.id,
-    kind,
-    field:dateField,
-    name:x.name||label,
-    date:x[dateField],
-    universe:x.universe||'',
-    description:x[descriptionField]||'',
-    record:x
-   });
+   items.push({id:x.id,kind,field:dateField,name:x.name||label,date:x[dateField],
+    universe:x.universe||'',description:x[descriptionField]||'',record:x});
   });
  }
-
  add('Character birth',db.characters,'birthDate','Birth','backstory');
  add('Character death',db.characters,'deathDate','Death','backstory');
  add('Universe founded',db.universes,'foundedDate','Universe founded','description');
@@ -1171,153 +1253,206 @@ function timelineItems(){
  add('Group founded',db.groups,'foundedDate','Group founded','history');
  add('Event',db.events,'date','Event','description');
  add('Reference saved',db.links,'savedDate','Reference saved','notes');
-
  return items.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
 }
 
 function timelinePage(){
  const events=timelineItems();
  const kinds=[...new Set(events.map(e=>e.kind))];
-
  document.getElementById('content').innerHTML=`
  <div class="timeline-controls">
   <input class="field search" id="timelineSearch" placeholder="Search the entire timeline..." oninput="filterTimeline()">
   <select class="field" style="max-width:220px" id="timelineKind" onchange="filterTimeline()">
-   <option value="">All entry types</option>
-   ${kinds.map(k=>`<option value="${esc(k)}">${esc(k)}</option>`).join('')}
+   <option value="">All entry types</option>${kinds.map(k=>`<option value="${esc(k)}">${esc(k)}</option>`).join('')}
   </select>
   <button class="btn primary" onclick="openCreate('events')">＋ Add timeline event</button>
  </div>
-
- <div class="card">
-  <span class="tag">Living chronology</span>
-  <h3>Your universe's history</h3>
-  <p>Every date attached to a character, universe, location, relationship, group, event or saved link appears here automatically. Add or edit a date in its original entry to update this timeline.</p>
+ <div class="card"><span class="tag">Living chronology</span><h3>Your universe's history</h3>
+  <p>Every date attached to a character, universe, location, relationship, group, event or saved link appears here automatically.</p>
   <div class="muted"><strong>${events.length}</strong> dated entries</div>
  </div>
-
  <div class="timeline" id="timelineEvents">
   ${events.length?events.map(ev=>`
    <div class="event" data-kind="${esc(ev.kind)}" data-search="${esc((ev.name+' '+ev.description+' '+ev.universe+' '+ev.kind).toLowerCase())}">
-    <time>${esc(ev.date)} · ${esc(ev.kind)}</time>
-    <h3>${esc(ev.name||ev.kind)}</h3>
+    <time>${esc(ev.date)} · ${esc(ev.kind)}</time><h3>${esc(ev.name||ev.kind)}</h3>
     <p>${esc(ev.description||'No description recorded.')}</p>
     ${ev.universe?`<span class="tag">${esc(ev.universe)}</span>`:''}
-    <p>
-     <button class="btn small" onclick="openTimelineSource('${ev.kind}','${ev.id}')">Edit source</button>
-     <button class="btn small danger" onclick="removeTimelineDate('${ev.kind}','${ev.id}','${ev.field}')">Remove date</button>
-    </p>
-   </div>
-  `).join(''):`<div class="empty">No dated entries yet. Add dates to existing entries or create your first event.</div>`}
+    <p><button class="btn small" onclick="openTimelineSource('${ev.kind}','${ev.id}')">Edit source</button>
+    <button class="btn small danger" onclick="removeTimelineDate('${ev.kind}','${ev.id}','${ev.field}')">Remove date</button></p>
+   </div>`).join(''):'<div class="empty">No dated entries yet. Add dates to existing entries or create your first event.</div>'}
  </div>`;
 }
 
 function sourceCollection(kind){
- const map={
-  'Character birth':'characters',
-  'Character death':'characters',
-  'Universe founded':'universes',
-  'Location established':'locations',
-  'Relationship began':'relationships',
-  'Relationship ended':'relationships',
-  'Group founded':'groups',
-  'Event':'events',
-  'Reference saved':'links'
- };
-
- return map[kind];
+ return {
+  'Character birth':'characters','Character death':'characters',
+  'Universe founded':'universes','Location established':'locations',
+  'Relationship began':'relationships','Relationship ended':'relationships',
+  'Group founded':'groups','Event':'events','Reference saved':'links'
+ }[kind];
 }
-
-function openTimelineSource(kind,i){
- const k=sourceCollection(kind);
- if(k)editEntry(k,i);
-}
-
+function openTimelineSource(kind,i){const k=sourceCollection(kind);if(k)editEntry(k,i)}
 function removeTimelineDate(kind,i,field){
- const k=sourceCollection(kind);
- if(!k)return;
-
- const item=db[k].find(x=>x.id===i);
- if(!item)return;
-
- if(!confirm(`Remove this date from "${item.name||'this entry'}"? The original entry will remain in your archive.`))return;
-
- item[field]='';
- item.updated=Date.now();
- save();
+ const k=sourceCollection(kind);if(!k)return;
+ const item=db[k].find(x=>x.id===i);if(!item)return;
+ if(!confirm(`Remove this date from "${item.name||'this entry'}"? The original entry will remain.`))return;
+ item[field]='';item.updated=Date.now();save();
 }
-
 function filterTimeline(){
- const input=document.getElementById('timelineSearch');
- const select=document.getElementById('timelineKind');
-
+ const input=document.getElementById('timelineSearch'),select=document.getElementById('timelineKind');
  if(!input||!select)return;
-
- const q=input.value.toLowerCase();
- const kind=select.value;
-
+ const q=input.value.toLowerCase(),kind=select.value;
  document.querySelectorAll('#timelineEvents .event').forEach(el=>{
   el.style.display=el.dataset.search.includes(q)&&(!kind||el.dataset.kind===kind)?'':'none';
  });
 }
 
-/* FAMILY TREE */
+/* FAMILY TREE GENERATION LOGIC */
 
 function isFamily(type=''){
  const t=type.toLowerCase();
-
- return [
-  'parent','child','sibling','grandparent','grandchild',
-  'aunt','uncle','niece','nephew','cousin','adoptive',
-  'adopted','other family'
- ].some(x=>t.includes(x));
+ return ['parent','child','sibling','grandparent','grandchild','aunt','uncle','niece','nephew','cousin','adoptive','adopted','other family'].some(x=>t.includes(x));
 }
-
-function isAdoption(type=''){
- return type.toLowerCase().includes('adopt');
-}
+function isAdoption(type=''){return type.toLowerCase().includes('adopt')}
 
 function relationshipColor(type=''){
- if(isFamily(type))return '#111111';
-
  const t=type.toLowerCase();
-
+ if(isFamily(t))return '#111111';
  if(t.includes('friend'))return '#398de0';
  if(t.includes('partner')||t.includes('spouse')||t.includes('romantic'))return '#df82a6';
  if(t.includes('rival')||t.includes('enemy'))return '#df5555';
  if(t.includes('colleague')||t.includes('mentor'))return '#b99ae8';
-
  return '#d7b878';
+}
+
+/* Positive delta means character B belongs in a later generation than A. */
+function generationDelta(type=''){
+ const t=type.toLowerCase();
+ if(t.includes('grandparent'))return 2;
+ if(t.includes('grandchild'))return -2;
+ if(t.includes('parent')||t==='adoptive parent')return 1;
+ if(t.includes('adopted child')||t==='child')return -1;
+ if(t.includes('aunt')||t.includes('uncle'))return 1;
+ if(t.includes('niece')||t.includes('nephew'))return -1;
+ return 0;
+}
+
+function calculateGenerations(characters,rels){
+ const ids=new Set(characters.map(c=>c.id));
+ const graph=new Map(characters.map(c=>[c.id,[]]));
+
+ rels.forEach(r=>{
+  if(!ids.has(r.characterA)||!ids.has(r.characterB))return;
+  if(!isFamily(r.type))return;
+  const delta=generationDelta(r.type);
+  graph.get(r.characterA).push({id:r.characterB,delta});
+  graph.get(r.characterB).push({id:r.characterA,delta:-delta});
+ });
+
+ const levels=new Map();
+ characters.forEach(c=>{
+  if(levels.has(c.id))return;
+  levels.set(c.id,0);
+  const queue=[c.id];
+  while(queue.length){
+   const current=queue.shift();
+   const base=levels.get(current);
+   (graph.get(current)||[]).forEach(edge=>{
+    if(!levels.has(edge.id)){
+     levels.set(edge.id,base+edge.delta);
+     queue.push(edge.id);
+    }
+   });
+  }
+ });
+ return levels;
+}
+
+let activeTreeRelationship=null;
+
+function treeLineClick(relId){
+ const rel=db.relationships.find(r=>r.id===relId);
+ if(!rel)return;
+ activeTreeRelationship=relId;
+
+ const box=document.getElementById('treeTooltip');
+ if(!box)return;
+
+ box.innerHTML=`
+  <strong>${esc(characterName(rel.characterA))} · ${esc(rel.type)} · ${esc(characterName(rel.characterB))}</strong>
+  <p>${esc(rel.howMet||rel.history||rel.status||'No additional relationship details have been added.')}</p>
+  <div class="toolbar">
+   <button class="btn small" onclick="editEntry('relationships','${rel.id}')">Edit connection</button>
+   <button class="btn small danger" onclick="deleteEntry('relationships','${rel.id}')">Remove connection</button>
+   <button class="btn small" onclick="hideTreeTooltip()">Close</button>
+  </div>`;
+ box.classList.add('show');
+
+ document.querySelectorAll('.tree-edge').forEach(line=>{
+  line.classList.toggle('selected',line.dataset.rel===relId);
+  line.classList.toggle('dimmed',line.dataset.rel!==relId);
+ });
+}
+
+function hideTreeTooltip(){
+ activeTreeRelationship=null;
+ document.getElementById('treeTooltip')?.classList.remove('show');
+ document.querySelectorAll('.tree-edge').forEach(line=>{
+  line.classList.remove('selected','dimmed');
+ });
 }
 
 function familyTree(){
  const universes=universeNames();
-
- const characters=db.characters.filter(c=>
-  selectedTreeUniverse==='all'||c.universe===selectedTreeUniverse
- );
-
+ const characters=db.characters.filter(c=>selectedTreeUniverse==='all'||c.universe===selectedTreeUniverse);
  const ids=new Set(characters.map(c=>c.id));
+ const rels=db.relationships.filter(r=>ids.has(r.characterA)&&ids.has(r.characterB));
 
- const rels=db.relationships.filter(r=>
-  ids.has(r.characterA)&&ids.has(r.characterB)
- );
+ const levels=calculateGenerations(characters,rels);
+ const groups=new Map();
 
- const nodes=characters.map((c,i)=>({
-  c,
-  x:12+(i%4)*25,
-  y:14+Math.floor(i/4)*28
- }));
+ characters.forEach(c=>{
+  const gen=levels.get(c.id)||0;
+  if(!groups.has(gen))groups.set(gen,[]);
+  groups.get(gen).push(c);
+ });
 
- const svg=rels.map(r=>{
-  const a=nodes.find(n=>n.c.id===r.characterA);
-  const b=nodes.find(n=>n.c.id===r.characterB);
+ const sortedGens=[...groups.keys()].sort((a,b)=>a-b);
+ const maxPerLevel=Math.max(1,...[...groups.values()].map(g=>g.length));
+ const cardWidth=175,gapX=55,gapY=145;
+ const stageWidth=Math.max(850,maxPerLevel*(cardWidth+gapX)+120);
+ const stageHeight=Math.max(460,sortedGens.length*gapY+100);
+ const positions={};
 
+ sortedGens.forEach((gen,row)=>{
+  const people=groups.get(gen);
+  const total=people.length;
+  const spread=total*(cardWidth+gapX)-gapX;
+  const start=(stageWidth-spread)/2+cardWidth/2;
+  people.forEach((person,i)=>{
+   positions[person.id]={
+    x:start+i*(cardWidth+gapX),
+    y:75+row*gapY,
+    generation:gen
+   };
+  });
+ });
+
+ const lines=rels.map(r=>{
+  const a=positions[r.characterA],b=positions[r.characterB];
   if(!a||!b)return '';
-
   const color=relationshipColor(r.type);
-
-  return `<line x1="${a.x}%" y1="${a.y}%" x2="${b.x}%" y2="${b.y}%" stroke="${color}" stroke-width="2.2" ${isAdoption(r.type)?'stroke-dasharray="6 5"':''}/>`;
+  const adoption=isAdoption(r.type);
+  const x1=a.x,y1=a.y+38,x2=b.x,y2=b.y-38;
+  const mid=(y1+y2)/2;
+  return `<path class="tree-edge" data-rel="${esc(r.id)}"
+   d="M ${x1} ${y1} C ${x1} ${mid}, ${x2} ${mid}, ${x2} ${y2}"
+   stroke="${color}" ${adoption?'stroke-dasharray="7 6"':''}
+   onmouseenter="treeEdgeHover('${r.id}',true)"
+   onmouseleave="treeEdgeHover('${r.id}',false)"
+   onclick="treeLineClick('${r.id}')">
+   <title>${esc(characterName(r.characterA))} · ${esc(r.type)} · ${esc(characterName(r.characterB))}</title>
+  </path>`;
  }).join('');
 
  document.getElementById('content').innerHTML=`
@@ -1331,25 +1466,38 @@ function familyTree(){
  </div>
 
  <div class="card">
-  <span class="tag">Connected character map</span>
+  <span class="tag">Generational family tree</span>
   <h3>Family & relationships</h3>
-  <p>Every character appears once. Lines connect the people you have linked. Character cards show portrait, name and age.</p>
+  <p>Family connections help arrange generations. Each character has their own card. Hover over a connection to highlight it, then click the line to edit or remove it.</p>
 
   <div class="tree-area">
-   <div class="tree-stage">
-    ${characters.length?`
-     <svg viewBox="0 0 100 100" preserveAspectRatio="none">${svg}</svg>
-     ${nodes.map(n=>`
-      <div class="tree-node" style="left:${n.x}%;top:${n.y}%">
-       <button class="person-card" onclick="editEntry('characters','${n.c.id}')">
-        ${n.c.portrait?`<img src="${esc(n.c.portrait)}" alt="">`:`<span class="portrait" style="display:grid;place-items:center">♙</span>`}
-        <span><strong>${esc(n.c.name)}</strong><small>Age ${esc(n.c.age||'Unknown')}</small></span>
+   <div class="tree-stage" style="width:${stageWidth}px;height:${stageHeight}px">
+    <svg viewBox="0 0 ${stageWidth} ${stageHeight}">
+     ${lines}
+    </svg>
+
+    ${sortedGens.map((gen,row)=>`
+     <div class="generation-label" style="top:${75+row*gapY}px;left:0">
+      ${gen===0?'Generation 0':gen<0?'Generation '+gen:'Generation +'+gen}
+     </div>
+    `).join('')}
+
+    ${characters.map(c=>{
+     const pos=positions[c.id];
+     return `
+      <div class="tree-node" style="left:${pos.x}px;top:${pos.y}px">
+       <button class="person-card" onclick="editEntry('characters','${c.id}')">
+        ${c.portrait?`<img src="${esc(c.portrait)}" alt="">`:'<span class="person-placeholder">♙</span>'}
+        <span><strong>${esc(c.name)}</strong><small>Age ${esc(c.age||'Unknown')}</small></span>
        </button>
-      </div>
-     `).join('')}
-    `:'<div class="empty">Add characters to begin building your relationship map.</div>'}
+      </div>`;
+    }).join('')}
+
+    ${!characters.length?'<div class="empty">Add characters to begin building your family tree.</div>':''}
    </div>
   </div>
+
+  <div id="treeTooltip" class="tree-tooltip"></div>
 
   <div class="key-list">
    ${[
@@ -1361,35 +1509,36 @@ function familyTree(){
     ['Professional','#b99ae8','solid'],
     ['Other','#d7b878','solid']
    ].map(x=>`
-    <div class="key-item">
-     <span class="key-line ${x[2]}" style="${x[2]==='solid'?`background:${x[1]}`:''}"></span>
-     ${x[0]}
-    </div>
+    <div class="key-item"><span class="key-line ${x[2]}" style="${x[2]==='solid'?`background:${x[1]}`:''}"></span>${x[0]}</div>
    `).join('')}
   </div>
+  <p class="tree-hint">Generation placement is calculated from the family relationships you enter. If a family connection is missing, the tree may need that relationship added to place everyone accurately.</p>
  </div>
 
  <div class="section-head">
-  <h2>Connection details</h2>
+  <h2>All connections</h2>
   <button class="btn small" onclick="openCreate('relationships')">＋ Add connection</button>
  </div>
-
  <div class="card">
   ${rels.length?rels.map(r=>`
    <div class="relationship-line">
-    <div>
-     <strong>${esc(characterName(r.characterA))}</strong>
+    <div><strong>${esc(characterName(r.characterA))}</strong>
      <span class="muted"> · ${esc(r.type)} · </span>
      <strong>${esc(characterName(r.characterB))}</strong>
      <p class="muted">${esc(r.howMet||r.status||'')}</p>
     </div>
-    <div>
-     <button class="btn small" onclick="editEntry('relationships','${r.id}')">Edit</button>
-     <button class="btn small danger" onclick="deleteEntry('relationships','${r.id}')">Remove</button>
-    </div>
+    <div><button class="btn small" onclick="editEntry('relationships','${r.id}')">Edit</button>
+    <button class="btn small danger" onclick="deleteEntry('relationships','${r.id}')">Remove</button></div>
    </div>
   `).join(''):'<p class="muted">No connections recorded yet.</p>'}
  </div>`;
+}
+
+function treeEdgeHover(relId,hovered){
+ const line=document.querySelector(`.tree-edge[data-rel="${CSS.escape(relId)}"]`);
+ if(!line)return;
+ if(hovered)line.classList.add('selected');
+ else if(activeTreeRelationship!==relId)line.classList.remove('selected');
 }
 
 function familyTreeSelect(v){
@@ -1402,7 +1551,6 @@ function familyTreeSelect(v){
 function atlasPage(){
  const places=db.locations;
  const active=places.find(p=>p.id===selectedLocation);
-
  document.getElementById('content').innerHTML=`
  <div class="map-controls">
   <select class="field" style="max-width:260px" id="mapUniverse" onchange="filterMap()">
@@ -1412,7 +1560,6 @@ function atlasPage(){
   <input class="field search" id="mapSearch" placeholder="Find a city, landmark or place..." oninput="filterMap()">
   <button class="btn primary" onclick="openCreate('locations')">＋ Add location</button>
  </div>
-
  <div class="map-layout">
   <div class="map-board" id="mapBoard">
    <svg viewBox="0 0 1000 650" preserveAspectRatio="none">
@@ -1423,25 +1570,17 @@ function atlasPage(){
     <path class="map-land" d="M650 365 L720 345 795 380 820 445 775 520 710 545 660 490 630 425Z"/>
     <path class="map-land" d="M855 430 L910 415 950 450 930 500 880 510 850 475Z"/>
    </svg>
-
    ${places.map(p=>`
-    <button class="map-marker"
-     data-id="${p.id}"
-     data-universe="${esc(p.universe||'')}"
+    <button class="map-marker" data-id="${p.id}" data-universe="${esc(p.universe||'')}"
      data-search="${esc((p.name+' '+p.type+' '+p.description).toLowerCase())}"
      style="left:${clamp(p.longitude,5,95,50)}%;top:${clamp(p.latitude,5,95,50)}%"
-     title="${esc(p.name)}"
-     onclick="selectMapLocation('${p.id}')">⌖</button>
+     title="${esc(p.name)}" onclick="selectMapLocation('${p.id}')">⌖</button>
    `).join('')}
   </div>
-
   <div class="map-side">
-   <div class="map-info">
-    <span class="tag">Selected location</span>
-
+   <div class="map-info"><span class="tag">Selected location</span>
     ${active?`
-     <h3>${esc(active.name)}</h3>
-     <p class="muted">${esc(active.type||'Location')} · ${esc(active.universe||'No universe')}</p>
+     <h3>${esc(active.name)}</h3><p class="muted">${esc(active.type||'Location')} · ${esc(active.universe||'No universe')}</p>
      ${active.image?`<img class="location-image" src="${esc(active.image)}" alt="">`:''}
      <p>${esc(active.description||'No description added.')}</p>
      ${active.population?`<p><strong>Population:</strong> ${esc(active.population)}</p>`:''}
@@ -1456,9 +1595,7 @@ function atlasPage(){
      <p class="map-tip">Choose a marker to view its description, history, images and details. Add a location to place a new marker on the map.</p>
     `}
    </div>
-
-   <div class="map-info">
-    <strong>Map markers</strong>
+   <div class="map-info"><strong>Map markers</strong>
     <p class="map-tip">Your locations are plotted using their saved map positions. Enter a horizontal and vertical position from 0 to 100 when creating a location. This is a schematic fantasy map, not a real geographic map.</p>
     <div class="map-tip">${places.length} locations saved</div>
    </div>
@@ -1470,134 +1607,92 @@ function clamp(v,min,max,def){
  const n=Number(v);
  return Number.isFinite(n)&&v!==''?Math.min(max,Math.max(min,n)):def;
 }
-
-function selectMapLocation(i){
- selectedLocation=i;
- atlasPage();
-}
-
+function selectMapLocation(i){selectedLocation=i;atlasPage()}
 function filterMap(){
  const u=document.getElementById('mapUniverse')?.value||'';
  const q=document.getElementById('mapSearch')?.value.toLowerCase()||'';
-
  document.querySelectorAll('.map-marker').forEach(m=>{
   m.style.display=(!u||m.dataset.universe===u)&&m.dataset.search.includes(q)?'grid':'none';
  });
 }
 
-/* BACKUP AND IMPORT */
+/* BACKUP, IMPORT AND SETTINGS */
 
 function backup(){
  document.getElementById('content').innerHTML=`
+ <div class="section-head"><h2>Make HQ your own</h2></div>
+ <div class="card">
+  <span class="tag">Personalisation</span>
+  <h3>Your HQ appearance</h3>
+  <p>Choose a theme, adjust colours, change fonts and upload your own background. These settings belong to your account and follow you between devices.</p>
+  <div id="settingsControls"></div>
+ </div>
+
+ <div class="section-head"><h2>Archive tools</h2></div>
  <div class="grid">
-  <div class="card">
-   <span class="tag">Export</span>
-   <h3>Download your archive</h3>
+  <div class="card"><span class="tag">Export</span><h3>Download your archive</h3>
    <p>Save all characters, universes, places, relationships, groups, events and links into one JSON backup file.</p>
    <button class="btn primary" onclick="exportData()">↓ Export backup</button>
   </div>
-
-  <div class="card">
-   <span class="tag">Import</span>
-   <h3>Restore a backup</h3>
+  <div class="card"><span class="tag">Import</span><h3>Restore a backup</h3>
    <p>Import a previous backup. This replaces the data currently stored in your cloud archive, so export a backup first.</p>
    <button class="btn" onclick="document.getElementById('importFile').click()">↑ Choose backup file</button>
   </div>
-
-  <div class="card">
-   <span class="tag">Cloud storage</span>
-   <h3>Your account</h3>
-   <p>Your entries are saved to your private Supabase account and can be accessed when you sign in on another device.</p>
+  <div class="card"><span class="tag">Cloud storage</span><h3>Your account</h3>
+   <p>Your entries and appearance settings are saved to your private account.</p>
    <p class="muted">${esc(currentUser?.email||'')}</p>
    <button class="btn" onclick="signOut()">Sign out</button>
   </div>
  </div>
-
  <div class="section-head"><h2>Archive summary</h2></div>
  <div class="stats">
-  ${Object.entries(counts()).map(([k,v])=>`
-   <div class="stat"><span>${configs[k].title}</span><strong>${v}</strong></div>
-  `).join('')}
+  ${Object.entries(counts()).map(([k,v])=>`<div class="stat"><span>${configs[k].title}</span><strong>${v}</strong></div>`).join('')}
  </div>
-
- <button class="btn danger" onclick="clearAll()">Clear all archive data</button>`;
+ <button class="btn danger" onclick="clearAll()">Clear all archive data</button>
+ `;
+ renderSettingsControls();
 }
 
 function exportData(){
  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
- const a=document.createElement('a');
- const url=URL.createObjectURL(blob);
-
- a.href=url;
- a.download='character-universe-hq-backup.json';
- a.click();
-
+ const a=document.createElement('a'),url=URL.createObjectURL(blob);
+ a.href=url;a.download='character-universe-hq-backup.json';a.click();
  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
 document.getElementById('importFile').addEventListener('change',e=>{
- const f=e.target.files[0];
- if(!f)return;
-
+ const f=e.target.files[0];if(!f)return;
  const r=new FileReader();
-
  r.onload=()=>{
   try{
    const d=JSON.parse(r.result);
-
    if(!d||typeof d!=='object')throw Error();
-
-   if(!confirm('Importing this backup will replace the entries in your current cloud archive. Export a backup first if you want to keep the current version. Continue?')){
-    e.target.value='';
-    return;
-   }
-
+   if(!confirm('Importing this backup will replace the entries in your current cloud archive. Export a backup first if you want to keep the current version. Continue?')){e.target.value='';return}
    db={...freshBlank(),...d};
-
-   Object.keys(blank).forEach(k=>{
-    if(!Array.isArray(db[k]))db[k]=[];
-   });
-
+   Object.keys(blank).forEach(k=>{if(!Array.isArray(db[k]))db[k]=[]});
    save();
    alert('Backup imported. Your cloud archive is now syncing.');
-
-  }catch(_){
-   alert('That file could not be read as a Character Universe HQ backup.');
-  }
+  }catch(_){alert('That file could not be read as a Character Universe HQ backup.')}
  };
-
- r.readAsText(f);
- e.target.value='';
+ r.readAsText(f);e.target.value='';
 });
 
 function clearAll(){
  if(confirm('This will delete every entry in your cloud archive. Export a backup first if you want to keep your work. Are you sure?')){
-  db=freshBlank();
-  selectedLocation=null;
-  selectedTreeUniverse='all';
-  save();
+  db=freshBlank();selectedLocation=null;selectedTreeUniverse='all';save();
  }
 }
 
 /* STARTUP */
 
 async function startApp(){
+ applyTheme();
  showAuth();
-
  const {data,error}=await supabaseClient.auth.getSession();
-
- if(error){
-  showAuthMessage(error.message,'error');
-  return;
- }
-
- if(data.session?.user){
-  await startUserSession(data.session.user);
- }
+ if(error){showAuthMessage(error.message,'error');return}
+ if(data.session?.user)await startUserSession(data.session.user);
 }
-
 startApp();
-
 </script>
 </body>
 </html>
