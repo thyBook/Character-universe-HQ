@@ -111,8 +111,6 @@ select option{background:#172233;color:white}
 .map-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .relationship-line{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .relationship-line:last-child{border-bottom:0}
-
-/* ACCOUNT SCREEN */
 #authScreen{min-height:100vh;display:none;align-items:center;justify-content:center;padding:20px}
 .auth-card{width:min(460px,100%);background:linear-gradient(145deg,#192638,#111a28);border:1px solid #45536a;border-radius:18px;padding:28px;box-shadow:var(--shadow)}
 .auth-card h1{font-size:34px;margin:8px 0}
@@ -132,7 +130,6 @@ select option{background:#172233;color:white}
 
 <body>
 
-<!-- SIGN IN / CREATE ACCOUNT -->
 <div id="authScreen">
  <div class="auth-card">
   <div class="sigil">✧</div>
@@ -218,17 +215,12 @@ select option{background:#172233;color:white}
 
 <input type="file" id="importFile" accept="application/json" hidden>
 
-<!-- Supabase library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 'use strict';
 
-/* =========================================================
-   SUPABASE CONNECTION
-   These are your public Project URL and publishable key.
-   Never put a service_role or secret key in this website.
-========================================================= */
+/* SUPABASE CONNECTION */
 
 const SUPABASE_URL='https://gxqywwapwefdexumxcnk.supabase.co';
 const SUPABASE_KEY='sb_publishable_UJRdvNNZguI2HYBRI8BvzA_g5h_AK1j';
@@ -238,9 +230,7 @@ const supabaseClient=window.supabase.createClient(
  SUPABASE_KEY
 );
 
-/* =========================================================
-   LOCAL DATA AND APP STATE
-========================================================= */
+/* LOCAL DATA AND APP STATE */
 
 const KEY='characterUniverseHQ_v1';
 
@@ -253,6 +243,8 @@ const blank={
  events:[],
  links:[]
 };
+
+const CLOUD_MARKER='__archive_state__';
 
 function freshBlank(){
  return Object.fromEntries(Object.keys(blank).map(k=>[k,[]]));
@@ -283,6 +275,9 @@ let cloudRowIds={};
 let cloudKnownIds={};
 let syncQueue=Promise.resolve();
 let authMode='signin';
+
+let refreshingCloud=false;
+let lastCloudRefresh=0;
 
 function id(){
  return 'e'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -323,9 +318,7 @@ function setSyncStatus(message,isError=false){
  el.classList.toggle('error',isError);
 }
 
-/* =========================================================
-   AUTHENTICATION
-========================================================= */
+/* AUTHENTICATION */
 
 function showAuthMessage(message,type=''){
  const el=document.getElementById('authMessage');
@@ -428,6 +421,8 @@ document.getElementById('resetPassword').addEventListener('click',async()=>{
 async function signOut(){
  if(!confirm('Sign out of Character Universe HQ?'))return;
 
+ cloudReady=false;
+
  try{
   await supabaseClient.auth.signOut();
  }catch(error){
@@ -439,18 +434,28 @@ supabaseClient.auth.onAuthStateChange((event,session)=>{
  if(event==='SIGNED_OUT'){
   currentUser=null;
   cloudReady=false;
+  cloudRowIds={};
+  cloudKnownIds={};
   showAuth();
  }
 });
 
+/*
+ IMPORTANT:
+ cloudReady is set BEFORE loadCloudData().
+ This allows the first cloud load to upload existing browser
+ entries and create the cloud-initialized marker.
+*/
+
 async function startUserSession(user){
  currentUser=user;
+ cloudReady=true;
+
  setSyncStatus('☁ Loading archive...');
  showApp();
 
  try{
   await loadCloudData();
-  cloudReady=true;
   render();
   setSyncStatus('☁ Cloud synced');
  }catch(error){
@@ -464,15 +469,7 @@ async function startUserSession(user){
  }
 }
 
-/* =========================================================
-   CLOUD DATABASE
-   Table: public.archive_entries
-
-   Expected columns:
-   id, user_id, kind, data, created_at, updated_at, entry_key
-
-   RLS policies should restrict rows to auth.uid() = user_id.
-========================================================= */
+/* CLOUD DATABASE */
 
 function hasLocalEntries(data){
  return Object.keys(blank).some(k=>(data[k]||[]).length>0);
@@ -484,14 +481,22 @@ function mergeArchives(local,remote){
  Object.keys(blank).forEach(kind=>{
   const map=new Map();
 
-  (remote[kind]||[]).forEach(item=>map.set(item.id,item));
-  (local[kind]||[]).forEach(item=>map.set(item.id,item));
+  (remote[kind]||[]).forEach(item=>map.set(String(item.id),item));
+  (local[kind]||[]).forEach(item=>map.set(String(item.id),item));
 
   merged[kind]=Array.from(map.values());
  });
 
  return merged;
 }
+
+/*
+ The marker tells the app that the cloud archive has been
+ initialized. Once it exists, cloud data is authoritative.
+
+ This prevents an old browser copy from restoring entries
+ that were deleted on another device.
+*/
 
 async function loadCloudData(){
  const {data:rows,error}=await supabaseClient
@@ -501,6 +506,7 @@ async function loadCloudData(){
  if(error)throw error;
 
  const remote=freshBlank();
+
  cloudRowIds={};
  cloudKnownIds={};
 
@@ -509,7 +515,12 @@ async function loadCloudData(){
   cloudKnownIds[k]=[];
  });
 
+ const cloudInitialized=(rows||[]).some(row=>
+  row.entry_key===CLOUD_MARKER
+ );
+
  (rows||[]).forEach(row=>{
+  if(row.entry_key===CLOUD_MARKER)return;
   if(!blank[row.kind]||!row.data)return;
 
   const item={
@@ -518,48 +529,43 @@ async function loadCloudData(){
   };
 
   remote[row.kind].push(item);
-  cloudRowIds[row.kind][item.id]=row.id;
-  cloudKnownIds[row.kind].push(item.id);
+  cloudRowIds[row.kind][String(item.id)]=row.id;
+  cloudKnownIds[row.kind].push(String(item.id));
  });
 
  const local=load();
- const localHasData=hasLocalEntries(local);
- const remoteHasData=hasLocalEntries(remote);
 
- if(localHasData){
-  db=mergeArchives(local,remote);
-
-  if(remoteHasData){
-   setSyncStatus('☁ Merging archives...');
-  }else{
-   setSyncStatus('☁ Moving browser entries to cloud...');
-  }
- }else{
+ if(cloudInitialized){
+  // Cloud is now the single source of truth.
   db=remote;
+ }else{
+  // First setup only: preserve existing browser entries.
+  db=mergeArchives(local,remote);
  }
 
  localStorage.setItem(KEY,JSON.stringify(db));
 
+ // Upload first-time browser entries and create the marker.
  await syncCloud();
-
- if(localHasData&&remoteHasData){
-  console.info('Existing browser entries and cloud entries were merged.');
- }else if(localHasData&&!remoteHasData){
-  console.info('Existing browser entries were copied to the cloud archive.');
- }
 }
+
+/*
+ A failed sync no longer poisons the queue.
+ Later saves can still run after a previous sync error.
+*/
 
 async function syncCloud(){
  if(!currentUser||!cloudReady)return;
 
- syncQueue=syncQueue.then(async()=>{
+ syncQueue=syncQueue.catch(()=>{}).then(async()=>{
+  const userId=currentUser.id;
   const snapshot=JSON.parse(JSON.stringify(db));
 
   for(const kind of Object.keys(blank)){
    const entries=snapshot[kind]||[];
    const currentIds=entries.map(x=>String(x.id));
 
-   // Remove cloud records that have been deleted locally.
+   // Delete records that have been removed from this archive.
    const oldIds=cloudKnownIds[kind]||[];
 
    for(const oldId of oldIds){
@@ -567,11 +573,12 @@ async function syncCloud(){
      const {error}=await supabaseClient
       .from('archive_entries')
       .delete()
-      .eq('user_id',currentUser.id)
+      .eq('user_id',userId)
       .eq('kind',kind)
       .eq('entry_key',String(oldId));
 
      if(error)throw error;
+
      delete cloudRowIds[kind][oldId];
     }
    }
@@ -582,7 +589,7 @@ async function syncCloud(){
 
     const row={
      id:cloudRowIds[kind][entryId]||crypto.randomUUID(),
-     user_id:currentUser.id,
+     user_id:userId,
      kind,
      entry_key:entryId,
      data:item,
@@ -603,8 +610,27 @@ async function syncCloud(){
    cloudKnownIds[kind]=currentIds;
   }
 
+  // Save a hidden marker so other devices know the cloud
+  // archive has already been initialized.
+  const {error:markerError}=await supabaseClient
+   .from('archive_entries')
+   .upsert({
+    id:crypto.randomUUID(),
+    user_id:userId,
+    kind:'events',
+    entry_key:CLOUD_MARKER,
+    data:{id:CLOUD_MARKER,system:true},
+    updated_at:new Date().toISOString()
+   },{
+    onConflict:'user_id,kind,entry_key'
+   });
+
+  if(markerError)throw markerError;
+
   setSyncStatus('☁ Cloud synced');
- }).catch(error=>{
+ });
+
+ syncQueue=syncQueue.catch(error=>{
   setSyncStatus('Sync failed',true);
   console.error('Cloud sync error:',error);
   throw error;
@@ -613,9 +639,44 @@ async function syncCloud(){
  return syncQueue;
 }
 
-/* =========================================================
-   SAVE
-========================================================= */
+/* REFRESH CLOUD WHEN RETURNING TO THE WEBSITE */
+
+async function refreshCloudArchive(){
+ if(!currentUser||!cloudReady||refreshingCloud)return;
+
+ // Avoid unnecessary repeated refreshes from focus and visibility events.
+ if(Date.now()-lastCloudRefresh<3000)return;
+
+ refreshingCloud=true;
+ lastCloudRefresh=Date.now();
+
+ try{
+  setSyncStatus('☁ Checking for updates...');
+
+  // Let any pending save finish before replacing local data.
+  await syncQueue.catch(()=>{});
+
+  await loadCloudData();
+
+  render();
+  setSyncStatus('☁ Cloud synced');
+ }catch(error){
+  console.error('Cloud refresh error:',error);
+  setSyncStatus('Refresh failed',true);
+ }finally{
+  refreshingCloud=false;
+ }
+}
+
+document.addEventListener('visibilitychange',()=>{
+ if(document.visibilityState==='visible'){
+  refreshCloudArchive();
+ }
+});
+
+window.addEventListener('focus',refreshCloudArchive);
+
+/* SAVE */
 
 function save(){
  try{
@@ -624,6 +685,7 @@ function save(){
 
   if(cloudReady){
    setSyncStatus('☁ Saving...');
+
    syncCloud().catch(error=>{
     console.error(error);
     setSyncStatus('Sync failed',true);
@@ -634,9 +696,7 @@ function save(){
  }
 }
 
-/* =========================================================
-   ENTRY CONFIGURATION
-========================================================= */
+/* ENTRY CONFIGURATION */
 
 const configs={
  characters:{
@@ -758,16 +818,16 @@ const pageTitles={
  backup:['Your archive','Keep a portable copy of everything you create.']
 };
 
-/* =========================================================
-   NAVIGATION AND RENDERING
-========================================================= */
+/* NAVIGATION AND RENDERING */
 
 function setPage(p){
  if(!configs[p]&&!pageTitles[p])return;
  page=p;
+
  document.querySelectorAll('nav button').forEach(b=>{
   b.classList.toggle('active',b.dataset.page===p);
  });
+
  render();
 }
 
@@ -801,9 +861,7 @@ function render(){
  else if(c)listPage(page);
 }
 
-/* =========================================================
-   DASHBOARD
-========================================================= */
+/* DASHBOARD */
 
 function dashboard(){
  const n=counts();
@@ -865,9 +923,7 @@ function recentCards(){
  `).join('');
 }
 
-/* =========================================================
-   CATEGORY LISTS AND CARDS
-========================================================= */
+/* CATEGORY LISTS AND CARDS */
 
 function listPage(k){
  const c=configs[k];
@@ -933,9 +989,7 @@ function filterCards(){
  });
 }
 
-/* =========================================================
-   CREATE AND EDIT FORMS
-========================================================= */
+/* CREATE AND EDIT FORMS */
 
 function openCreate(k=page){
  if(!configs[k])k='characters';
@@ -1047,9 +1101,7 @@ document.getElementById('entryForm').addEventListener('submit',e=>{
  save();
 });
 
-/* =========================================================
-   DELETE ENTRIES
-========================================================= */
+/* DELETE ENTRIES */
 
 function deleteEntry(k,i){
  const item=db[k]?.find(x=>x.id===i);
@@ -1067,7 +1119,6 @@ function deleteEntry(k,i){
    ...ev,
    characters:(ev.characters||[]).filter(cid=>cid!==i)
   }));
-  if(selectedLocation===i)selectedLocation=null;
  }
 
  if(k==='universes'){
@@ -1089,9 +1140,7 @@ function deleteEntry(k,i){
  save();
 }
 
-/* =========================================================
-   UNIVERSAL TIMELINE
-========================================================= */
+/* UNIVERSAL TIMELINE */
 
 function timelineItems(){
  const items=[];
@@ -1212,9 +1261,7 @@ function filterTimeline(){
  });
 }
 
-/* =========================================================
-   FAMILY TREE
-========================================================= */
+/* FAMILY TREE */
 
 function isFamily(type=''){
  const t=type.toLowerCase();
@@ -1350,9 +1397,7 @@ function familyTreeSelect(v){
  familyTree();
 }
 
-/* =========================================================
-   WORLD ATLAS
-========================================================= */
+/* WORLD ATLAS */
 
 function atlasPage(){
  const places=db.locations;
@@ -1440,9 +1485,7 @@ function filterMap(){
  });
 }
 
-/* =========================================================
-   BACKUP AND IMPORT
-========================================================= */
+/* BACKUP AND IMPORT */
 
 function backup(){
  document.getElementById('content').innerHTML=`
@@ -1536,9 +1579,7 @@ function clearAll(){
  }
 }
 
-/* =========================================================
-   STARTUP
-========================================================= */
+/* STARTUP */
 
 async function startApp(){
  showAuth();
