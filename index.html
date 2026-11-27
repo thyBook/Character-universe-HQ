@@ -157,6 +157,19 @@ select option{background:var(--panel)}
 .studio-side .btn{margin:3px 0}
 .city-label{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:#101a;color:#fff;padding:6px 12px;border-radius:8px;font-weight:bold;z-index:5;pointer-events:none;white-space:nowrap}
 .studio-help{font-size:11px;color:var(--muted);margin:9px 0}
+.module-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:14px 0}
+.module-card{background:linear-gradient(145deg,color-mix(in srgb,var(--panel2) 90%,transparent),var(--panel));border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.module-card .module-icon{font-size:25px;color:var(--gold)}
+.module-card h3{font:20px Georgia,serif;margin:8px 0}
+.module-card p{color:var(--muted);font-size:12px;min-height:36px}
+.active-universe{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--gold);border-radius:99px;padding:5px 10px;color:var(--gold);font-size:11px}
+.search-result{display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px solid var(--line);padding:12px 0}
+.search-result:last-child{border-bottom:0}
+.search-result p{margin:3px 0;color:var(--muted);font-size:12px}
+.magic-banner{border:1px solid #8c6bbd;background:linear-gradient(120deg,#302345,#182033 70%);border-radius:16px;padding:20px;margin:10px 0 18px}
+.magic-banner h2{font:27px Georgia,serif;margin:0 0 6px;color:#e7d5ff}
+@media(max-width:950px){.module-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.module-grid{grid-template-columns:1fr}.search-result{align-items:flex-start;flex-direction:column}}
 @media(max-width:950px){
 .shell{grid-template-columns:1fr}
 aside{position:relative;height:auto;padding:10px;border-right:0;border-bottom:1px solid var(--line)}
@@ -164,7 +177,7 @@ aside{position:relative;height:auto;padding:10px;border-right:0;border-bottom:1p
 .nav-label,.side-note{display:none}
 nav{display:flex;overflow:auto;gap:3px}
 nav button{white-space:nowrap;width:auto;font-size:12px;padding:8px}
-.map-layout{grid-template-columns:1fr}
+ .map-layout{grid-template-columns:1fr}
 }
 @media(max-width:700px){
 .topbar{align-items:flex-start;flex-direction:column}
@@ -209,6 +222,18 @@ nav button{white-space:nowrap;width:auto;font-size:12px;padding:8px}
   <button data-page="relationships"><span class="ico">♡</span>Relationships</button>
   <button data-page="familytree"><span class="ico">♧</span>Family Tree</button>
   <button data-page="groups"><span class="ico">⚑</span>Groups & factions</button>
+  <div class="nav-label">Worldbuilding</div>
+  <button data-page="kingdoms"><span class="ico">♛</span>Kingdom Builder</button>
+  <button data-page="bloodlines"><span class="ico">♧</span>Generations & Bloodlines</button>
+  <button data-page="buildings"><span class="ico">⌂</span>Building Designer</button>
+  <button data-page="newspapers"><span class="ico">▤</span>World Newspaper</button>
+  <button data-page="governments"><span class="ico">⚖</span>Politics & Power</button>
+  <button data-page="festivals"><span class="ico">♬</span>Calendar & Festivals</button>
+  <button data-page="creatures"><span class="ico">🐉</span>Creatures Encyclopedia</button>
+  <button data-page="universeSwitcher"><span class="ico">✧</span>Universe Switcher</button>
+  <button data-page="everythingSearch"><span class="ico">⌕</span>Everything Search</button>
+  <div class="nav-label">Magic department</div>
+  <button data-page="magicHQ"><span class="ico">✧</span>Magic HQ</button>
   <div class="nav-label">Chronicles</div>
   <button data-page="timeline"><span class="ico">◷</span>Timeline</button>
   <button data-page="links"><span class="ico">↗</span>Link Library</button>
@@ -244,7 +269,7 @@ const SUPABASE_URL='https://gxqywwapwefdexumxcnk.supabase.co';
 const SUPABASE_KEY='sb_publishable_UJRdvNNZguI2HYBRI8BvzA_g5h_AK1j';
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const KEY='characterUniverseHQ_v1',CLOUD_MARKER='__archive_state__',SETTINGS_KEY='__hq_settings__';
-const blank={characters:[],universes:[],locations:[],relationships:[],groups:[],events:[],links:[],maps:[],mapObjects:[]};
+const blank={characters:[],universes:[],locations:[],relationships:[],groups:[],events:[],links:[],maps:[],mapObjects:[],kingdoms:[],bloodlines:[],buildings:[],newspapers:[],governments:[],festivals:[],creatures:[],magicSystems:[],magicTypes:[],spells:[],magicalObjects:[],potions:[],enchantments:[],magicLocations:[],academies:[],portals:[],magicLanguages:[],magicHistory:[]};
 const DEFAULT_SETTINGS={theme:'midnight',bg:'#0c111b',panel:'#151d2b',panel2:'#1b2637',line:'#2a374b',text:'#edf1f8',muted:'#9aa8bc',accent:'#d7b878',font:'Inter',overlay:48,blur:0,fit:'cover',position:'center',backgroundPath:''};
 const THEMES={
 midnight:{bg:'#0c111b',panel:'#151d2b',panel2:'#1b2637',line:'#2a374b',text:'#edf1f8',muted:'#9aa8bc',accent:'#d7b878'},
@@ -272,7 +297,7 @@ function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'{}');const d=
 function id(){return 'e'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
 function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function characterName(i){return db.characters.find(c=>c.id===i)?.name||i||'Unknown'}
-function universeNames(){return [...new Set([...db.universes.map(x=>x.name),...db.characters.map(x=>x.universe),...db.locations.map(x=>x.universe),...db.groups.map(x=>x.universe),...db.events.map(x=>x.universe)].filter(Boolean))]}
+function universeNames(){const values=[];Object.keys(db).forEach(k=>(db[k]||[]).forEach(x=>{if(x.name&&k==='universes')values.push(x.name);if(x.universe)values.push(x.universe)}));return [...new Set(values.filter(Boolean))]}
 function setSyncStatus(t,err=false){const e=document.getElementById('syncStatus');if(e){e.textContent=t;e.classList.toggle('error',err)}}
 function fontStack(f){return ({Inter:'Inter,system-ui,sans-serif',Georgia:'Georgia,serif',Arial:'Arial,sans-serif',Verdana:'Verdana,sans-serif','Trebuchet MS':'Trebuchet MS,sans-serif','Courier New':'Courier New,monospace'})[f]||'Inter,system-ui,sans-serif'}
 function applyTheme(){
@@ -290,7 +315,7 @@ async function showBackground(){
 async function saveHQSettings(){
  if(!currentUser||!cloudReady)return;
  try{
- const row={id:crypto.randomUUID(),user_id:currentUser.id,kind:'events',entry_key:SETTINGS_KEY,data:{...hqSettings,id:SETTINGS_KEY},updated_at:new Date().toISOString()};
+ const row={id:crypto.randomUUID(),user_id:currentUser.id,kind:'events',entry_key:SETTINGS_KEY,data:{...hqSettings,activeUniverse,id:SETTINGS_KEY},updated_at:new Date().toISOString()};
  const {error}=await supabaseClient.from('archive_entries').upsert(row,{onConflict:'user_id,kind,entry_key'});
  if(error)throw error;setSyncStatus('☁ Appearance saved');
  }catch(e){console.error(e);setSyncStatus('Settings save failed',true)}
@@ -332,7 +357,7 @@ function showAuth(){document.getElementById('authScreen').style.display='flex';d
 function showApp(){document.getElementById('authScreen').style.display='none';document.getElementById('appShell').style.display='grid';document.getElementById('accountEmail').textContent=currentUser?.email?'Signed in as '+currentUser.email:''}
 document.getElementById('switchAuth').onclick=()=>{
  authMode=authMode==='signin'?'signup':'signin';
- document.getElementById('authSubmit').textContent=authMode==='signin'?'Sign in':'Create account';
+  document.getElementById('authSubmit').textContent=authMode==='signin'?'Sign in':'Create account';
  document.getElementById('switchAuth').textContent=authMode==='signin'?'Create a new account':'Back to sign in';
  document.getElementById('authPassword').autocomplete=authMode==='signin'?'current-password':'new-password';clearAuthMessage();
 };
@@ -383,7 +408,7 @@ async function loadCloudData(){
    const m=new Map();(remote[k]||[]).forEach(x=>m.set(String(x.id),x));(local[k]||[]).forEach(x=>m.set(String(x.id),x));db[k]=[...m.values()];
   });
  }
- hqSettings={...DEFAULT_SETTINGS,...(settings||{})};
+ hqSettings={...DEFAULT_SETTINGS,...(settings||{})};activeUniverse=settings?.activeUniverse||'All universes';
  localStorage.setItem(KEY,JSON.stringify(db));applyTheme();await showBackground();
  await syncCloud();
  if(!settings&&initialized)await saveHQSettings();
@@ -430,7 +455,7 @@ async function startUserSession(user){
 /* ENTRY CONFIG */
 const configs={
 characters:{title:'Characters',sub:'The people who make your universes breathe.',singular:'character',fields:[
-['name','Full name','text',true],['age','Current age','text'],['birthDate','Birth date','date'],['deathDate','Death date','date'],['pronouns','Pronouns','text'],['universe','Universe','universe-name'],['species','Species','text'],['portrait','Portrait image URL','url'],['appearance','Appearance','textarea'],['personality','Personality','textarea'],['backstory','Backstory','textarea'],['secrets','Secrets / notes','textarea']]},
+['name','Full name','text',true],['age','Current age','text'],['birthDate','Birth date','date'],['deathDate','Death date','date'],['pronouns','Pronouns','text'],['universe','Universe','universe-name'],['species','Species','text'],['portrait','Portrait image URL','url'],['appearance','Appearance','textarea'],['personality','Personality','textarea'],['backstory','Backstory','textarea'],['secrets','Secrets / notes','textarea'],['magicSystem','Magic system','text'],['magicalAbilities','Magical abilities','textarea'],['magicalLimitations','Magical limitations','textarea'],['magicalBloodline','Magical bloodline','text']]},
 universes:{title:'Universes',sub:'Keep each world and its rules in one place.',singular:'universe',fields:[
 ['name','Universe name','text',true],['genre','Genre','text'],['foundedDate','Creation / founding date','date'],['description','Description','textarea'],['mainWorld','Main world','text'],['notes','Rules / extra notes','textarea']]},
 locations:{title:'World Atlas',sub:'Build worlds, maps, cities and detailed places.',singular:'location',fields:[
@@ -444,16 +469,73 @@ events:{title:'Timeline',sub:'A chronological history of events.',singular:'even
 links:{title:'Link Library',sub:'Keep research and inspiration together.',singular:'link',fields:[
 ['name','Link title','text',true],['url','URL','url',true],['category','Category','text'],['savedDate','Date saved','date'],['notes','Why you saved it','textarea']]}
 };
-const pageTitles={dashboard:['Welcome back.','Every universe begins somewhere. This is yours.'],familytree:['Family Tree','Explore every family and personal connection.'],timeline:['Timeline','Every dated detail, brought together.'],backup:['Your archive','Keep a portable copy of everything you create.']};
+
+/* EXPANSION MODULES: all records use the same private archive + cloud sync. */
+Object.assign(configs,{
+ kingdoms:{title:'Kingdom Builder',sub:'Design nations, realms, borders and royal institutions.',singular:'kingdom',fields:[['name','Kingdom name','text',true],['universe','Universe','universe-name'],['capital','Capital city','text'],['ruler','Current ruler','text'],['royalHouse','Royal house / dynasty','text'],['government','Government system','text'],['currency','Currency','text'],['languages','Languages','text'],['flag','Flag / emblem description','text'],['regions','Regions and territories','textarea'],['laws','Important laws','textarea'],['alliances','Allies and rival kingdoms','textarea'],['history','Kingdom history','textarea'],['description','Description','textarea']]},
+ bloodlines:{title:'Generations & Bloodlines',sub:'Record dynasties, ancestry, inheritance and family legacies.',singular:'bloodline',fields:[['name','Bloodline / dynasty name','text',true],['universe','Universe','universe-name'],['founder','Founder','text'],['currentHead','Current family head','text'],['members','Known members','textarea'],['ancestry','Ancestry and origins','textarea'],['inheritedTraits','Inherited traits or abilities','textarea'],['inheritanceRules','Inheritance rules','textarea'],['legacy','Legacy and historical importance','textarea'],['secrets','Family secrets / notes','textarea']]},
+ buildings:{title:'Building Designer',sub:'Plan castles, homes, academies and important structures.',singular:'building',fields:[['name','Building name','text',true],['universe','Universe','universe-name'],['location','Location / city','text'],['buildingType','Building type','select',['Castle','Palace','House','Mansion','School','Academy','Tower','Temple','Government building','Shop','Hospital','Other']],['owner','Owner / resident','text'],['floors','Number of floors','number'],['architect','Architect / builder','text'],['style','Architectural style','text'],['rooms','Room list (one per line)','textarea'],['floorPlan','Floor plan / layout notes','textarea'],['features','Special features','textarea'],['history','Building history','textarea']]},
+ newspapers:{title:'World Newspaper',sub:'Publish headlines, announcements and stories from your worlds.',singular:'newspaper article',fields:[['headline','Headline','text',true],['publication','Newspaper / publication','text'],['universe','Universe','universe-name'],['date','Publication date','date'],['section','Section','select',['Breaking News','Politics','Royalty','Community','Culture','Sports','Magic','Classifieds','Opinion','Other']],['byline','Author / reporter','text'],['location','Location','text'],['article','Article text','textarea'],['relatedCharacters','People mentioned','textarea'],['sourceNotes','Sources / editorial notes','textarea']]},
+ governments:{title:'Politics & Power',sub:'Track rulers, governments, laws, elections and alliances.',singular:'political record',fields:[['name','Government / political record','text',true],['universe','Universe','universe-name'],['kingdom','Kingdom / country','text'],['system','Political system','text'],['leader','Leader / head of state','text'],['officials','Officials and departments','textarea'],['parties','Parties / factions','textarea'],['laws','Laws and policies','textarea'],['elections','Elections and succession','textarea'],['alliances','Treaties and alliances','textarea'],['opposition','Opposition and disputes','textarea'],['history','Political history','textarea']]},
+ festivals:{title:'Calendar & Festivals',sub:'Create holidays, celebrations, seasons and custom calendar events.',singular:'festival or calendar event',fields:[['name','Festival / event name','text',true],['universe','Universe','universe-name'],['date','Date or calendar day','text'],['season','Season','text'],['duration','Duration','text'],['location','Where it is celebrated','text'],['traditions','Traditions and activities','textarea'],['food','Food, clothing and decorations','textarea'],['meaning','Meaning / origin','textarea'],['participants','Who celebrates it','textarea']]},
+ creatures:{title:'Creatures Encyclopedia',sub:'Document species, habitats, abilities and individual creatures.',singular:'creature / species',fields:[['name','Species or creature name','text',true],['universe','Universe','universe-name'],['classification','Species classification','text'],['habitat','Habitat','text'],['lifespan','Lifespan','text'],['diet','Diet','text'],['abilities','Abilities','textarea'],['weaknesses','Weaknesses / limitations','textarea'],['appearance','Appearance','textarea'],['behaviour','Behaviour and temperament','textarea'],['culture','Culture / social structure','textarea'],['origin','Origins and history','textarea'],['notes','Additional notes','textarea']]},
+ magicSystems:{title:'Magic System Creator',sub:'Build independent, shared and interconnected magic systems.',singular:'magic system',fields:[['name','Magic system name','text',true],['universe','Primary universe (or Shared)','universe-name'],['sharing','Sharing','select',['Universe-specific','Shared across universes','Hybrid']],['source','Source of magic','textarea'],['rules','Core rules','textarea'],['limits','Limitations and costs','textarea'],['access','Who can use it','textarea'],['branches','Branches and categories','textarea'],['history','Origins and history','textarea']]},
+ magicTypes:{title:'Magic Codex',sub:'Catalogue magical disciplines, elements, affinities and traditions.',singular:'magic type',fields:[['name','Magic type / branch','text',true],['universe','Universe or Shared','universe-name'],['system','Related magic system','text'],['category','Category','text'],['element','Element / affinity','text'],['users','Known users','textarea'],['properties','Properties and effects','textarea'],['restrictions','Restrictions','textarea'],['history','History','textarea']]},
+ spells:{title:'Spell Library',sub:'Record spells, incantations, inventors and magical effects.',singular:'spell',fields:[['name','Spell name','text',true],['universe','Universe or Shared','universe-name'],['magicType','Magic type','text'],['system','Magic system','text'],['inventor','Inventor','text'],['users','Who can perform it','textarea'],['difficulty','Difficulty','text'],['effect','What it does','textarea'],['incantation','Words / runes','textarea'],['limitations','Limits and risks','textarea'],['history','History','textarea']]},
+ magicalObjects:{title:'Magical Objects Archive',sub:'Track enchanted artefacts, ownership and every known location.',singular:'magical object',fields:[['name','Object name','text',true],['universe','Universe or Shared','universe-name'],['objectType','Object type','text'],['rarity','Rarity','text'],['creator','Creator','text'],['currentOwner','Current owner','text'],['currentLocation','Current location','text'],['previousOwners','Previous owners','textarea'],['journey','Places visited / journey history','textarea'],['powers','Powers and properties','textarea'],['status','Status','select',['Known','Lost','Hidden','Stolen','Destroyed','Unknown']],['history','Historical events and story','textarea']]},
+ potions:{title:'Potion Laboratory',sub:'Invent potions, ingredients, effects and brewing notes.',singular:'potion',fields:[['name','Potion name','text',true],['universe','Universe or Shared','universe-name'],['purpose','Purpose','text'],['ingredients','Ingredients','textarea'],['method','Brewing method','textarea'],['effects','Effects','textarea'],['duration','Duration','text'],['limitations','Limitations / side effects','textarea'],['inventor','Inventor','text'],['notes','Research notes','textarea']]},
+ enchantments:{title:'Enchantment Workshop',sub:'Design enchantments and magical crafting projects.',singular:'enchantment',fields:[['name','Enchantment name','text',true],['universe','Universe or Shared','universe-name'],['target','Object / person / place enchanted','text'],['creator','Enchanter','text'],['effect','Enchantment effect','textarea'],['method','Method / materials','textarea'],['duration','Duration','text'],['conditions','Conditions and limits','textarea'],['history','History','textarea']]},
+ magicLocations:{title:'Magical Locations',sub:'Map places where magic originates, gathers or behaves differently.',singular:'magical location',fields:[['name','Location name','text',true],['universe','Universe','universe-name'],['locationType','Type','text'],['linkedPlace','World Atlas location','text'],['magicalProperties','Magical properties','textarea'],['magicStrength','Magic presence / intensity','text'],['knownEvents','Events that happened here','textarea'],['guardians','Guardians / inhabitants','textarea'],['history','History','textarea']]},
+ academies:{title:'Magical Academies',sub:'Create magical schools, houses, subjects and traditions.',singular:'academy',fields:[['name','Academy name','text',true],['universe','Universe','universe-name'],['location','Location','text'],['founder','Founder','text'],['head','Head / principal','text'],['houses','Houses / divisions','textarea'],['subjects','Subjects and classes','textarea'],['staff','Teachers and staff','textarea'],['students','Students','textarea'],['traditions','Uniforms and traditions','textarea'],['history','History','textarea']]},
+ portals:{title:'Portals & Dimensions',sub:'Document gateways, connected realms and dimensional routes.',singular:'portal / dimension',fields:[['name','Portal or dimension name','text',true],['universe','Universe','universe-name'],['portalType','Type','text'],['origin','Origin location','text'],['destination','Destination location / dimension','text'],['access','Who can access it','textarea'],['conditions','Activation conditions','textarea'],['stability','Stability / limitations','text'],['history','Discovery and history','textarea']]},
+ magicLanguages:{title:'Magical Languages',sub:'Invent runes, scripts, incantations and magical communication.',singular:'magical language',fields:[['name','Language name','text',true],['universe','Universe or Shared','universe-name'],['writingSystem','Writing system','text'],['speakers','Who speaks / reads it','textarea'],['grammar','Grammar and structure','textarea'],['runes','Runes / symbols','textarea'],['translation','Translations / vocabulary','textarea'],['magicalUse','Magical uses','textarea'],['history','Origins and history','textarea']]},
+ magicConflicts:{title:'Magical Conflicts',sub:'Record magical disputes, rivalries, historical conflicts and their consequences.',singular:'magical conflict',fields:[['name','Conflict name','text',true],['universe','Universe','universe-name'],['period','Date / era','text'],['participants','People, groups or kingdoms involved','textarea'],['cause','Causes','textarea'],['magicInvolved','Magic systems / spells involved','textarea'],['outcome','Outcome','textarea'],['consequences','Consequences and historical impact','textarea']]},
+ magicHistory:{title:'Magic Timeline',sub:'Record discoveries, magical eras and major events.',singular:'magical historical event',fields:[['name','Event name','text',true],['universe','Universe or Shared','universe-name'],['date','Date / era','text',true],['eventType','Event type','text'],['location','Location','text'],['people','People involved','textarea'],['description','What happened','textarea'],['consequences','Consequences','textarea']]}
+});
+let activeUniverse='All universes';
+const pageTitles={magicHQ:['Magic HQ','A complete magical department, connected to every corner of your worlds.'],universeSwitcher:['Universe Switcher','Move between worlds while keeping their archives connected.'],everythingSearch:['Everything Search','Find characters, places, magic, history and every other detail.'],magicVisualiser:['Magic Visualiser','Explore the connections between magic systems, spells, characters, objects and places.'],dashboard:['Welcome back.','Every universe begins somewhere. This is yours.'],familytree:['Family Tree','Explore every family and personal connection.'],timeline:['Timeline','Every dated detail, brought together.'],backup:['Your archive','Keep a portable copy of everything you create.']};
 function setPage(p){if(!configs[p]&&!pageTitles[p])return;page=p;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));render()}
 document.getElementById('nav').addEventListener('click',e=>{const b=e.target.closest('button[data-page]');if(b)setPage(b.dataset.page)});
 function counts(){return Object.fromEntries(Object.keys(blank).map(k=>[k,db[k].length]))}
-function render(){
+ function render(){
  const c=configs[page],t=pageTitles[page]||[c.title,c.sub];
  document.getElementById('pageTitle').textContent=t[0];document.getElementById('pageSub').textContent=t[1];
- document.getElementById('eyebrow').textContent=page==='dashboard'?'Your creative archive':page==='backup'?'Archive tools':'Character Universe HQ';
+ document.getElementById('eyebrow').textContent=page==='dashboard'?'Your creative archive':page==='backup'?'Archive tools':(activeUniverse==='All universes'?'Character Universe HQ':'Universe · '+activeUniverse);
  document.getElementById('topActions').style.display=page==='backup'?'none':'flex';
- if(page==='dashboard')dashboard();else if(page==='backup')backup();else if(page==='familytree')familyTree();else if(page==='timeline')timelinePage();else if(page==='locations')atlasPage();else if(c)listPage(page);
+ if(page==='dashboard')dashboard();else if(page==='backup')backup();else if(page==='familytree')familyTree();else if(page==='timeline')timelinePage();else if(page==='locations')atlasPage();else if(page==='magicHQ')magicHQPage();else if(page==='universeSwitcher')universeSwitcherPage();else if(page==='everythingSearch')everythingSearchPage();else if(page==='magicVisualiser')magicVisualiserPage();else if(c)listPage(page);
+}
+function moduleCard(icon,title,desc,target){return `<article class="module-card"><div class="module-icon">${icon}</div><h3>${title}</h3><p>${desc}</p><button class="btn small" onclick="setPage('${target}')">Open ${title} →</button></article>`}
+function magicHQPage(){
+ const modules=[['📚','Magic System Creator','Create universe-specific, shared or hybrid magic systems.','magicSystems'],['🔮','Magic Codex','Catalogue elements, disciplines, affinities and branches.','magicTypes'],['📖','Spell Library','Spells, inventors, incantations, effects and limitations.','spells'],['💎','Magical Objects Archive','Track powers, owners, current locations and object journeys.','magicalObjects'],['🧪','Potion Laboratory','Create potion recipes, ingredients and effects.','potions'],['✨','Enchantment Workshop','Record enchantments, crafting methods and conditions.','enchantments'],['🌙','Magical Locations','Places with unique magical properties and histories.','magicLocations'],['🏫','Magical Academies','Schools, houses, teachers, students and subjects.','academies'],['🌀','Portals & Dimensions','Connected worlds, gateways and dimensional routes.','portals'],['🔤','Magical Languages','Runes, scripts, vocabulary and incantations.','magicLanguages'],['🐉','Creatures Encyclopedia','Species, habitats, abilities and magical biology.','creatures'],['🕰️','Magic Timeline','Discoveries, ancient eras and magical events.','magicHistory'],['⚔️','Magical Conflicts','Conflicts, causes, outcomes and magical history.','magicConflicts'],['🕸️','Magic Visualiser','Explore the web of connections across your magic archive.','magicVisualiser'],['♧','Magical Bloodlines','Connect inherited magic to family histories.','bloodlines'],['🗺️','World Atlas','Link magical places to your maps and locations.','locations']];
+ document.getElementById('content').innerHTML=`<div class="magic-banner"><h2>✧ The Magic Department ✧</h2><p>One dedicated magical archive, with support for independent systems in each universe and shared magic across multiple universes. Magic records can reference characters, kingdoms, locations, objects, creatures and timelines.</p><span class="active-universe">Current universe: ${esc(activeUniverse)}</span></div><div class="stats"><div class="stat"><span>Magic systems</span><strong>${db.magicSystems.length}</strong></div><div class="stat"><span>Spells</span><strong>${db.spells.length}</strong></div><div class="stat"><span>Magical objects</span><strong>${db.magicalObjects.length}</strong></div><div class="stat"><span>Academies</span><strong>${db.academies.length}</strong></div></div><div class="module-grid">${modules.map(m=>moduleCard(...m)).join('')}</div>`;
+}
+function magicVisualiserPage(){
+ const systems=db.magicSystems,types=db.magicTypes,spells=db.spells,objects=db.magicalObjects,creatures=db.creatures,places=db.magicLocations;
+ const groups=[['Magic systems',systems,'magicSystems'],['Magic types',types,'magicTypes'],['Spells',spells,'spells'],['Characters',db.characters.filter(c=>c.magicSystem||c.magicalAbilities||c.magicalBloodline),'characters'],['Magical objects',objects,'magicalObjects'],['Creatures',creatures,'creatures'],['Magical places',places,'magicLocations']];
+ document.getElementById('content').innerHTML=`<div class="magic-banner"><h2>🕸️ Magic Visualiser</h2><p>Explore the records that make up your magical world. Add matching system, type or character names in related records to build richer connections.</p></div><div class="module-grid">${groups.map(([label,arr,target])=>`<article class="module-card"><div class="module-icon">✧</div><h3>${label}</h3><strong>${arr.length}</strong><p>Saved records</p><button class="btn small" onclick="setPage('${target}')">Open ${label} →</button></article>`).join('')}</div><div class="card"><h3>Connection explorer</h3><p>Search a magic system, element, spell or artefact name to find records that mention it anywhere in their saved details.</p><input class="field" id="magicGraphQuery" placeholder="Enter a magic system, spell or object name..." oninput="runMagicVisualiser()"><div id="magicGraphResults" style="margin-top:12px"><p class="muted">Type a name to reveal its connected records.</p></div></div>`;
+}
+function runMagicVisualiser(){
+ const q=(document.getElementById('magicGraphQuery')?.value||'').trim().toLowerCase(),host=document.getElementById('magicGraphResults');if(!host)return;if(!q){host.innerHTML='<p class="muted">Type a name to reveal its connected records.</p>';return}
+ const found=[];['magicSystems','magicTypes','spells','magicalObjects','potions','enchantments','magicLocations','academies','portals','magicLanguages','magicHistory','magicConflicts','characters','creatures','locations','kingdoms','bloodlines'].forEach(k=>(db[k]||[]).forEach(x=>{if(JSON.stringify(x).toLowerCase().includes(q))found.push({kind:k,item:x})}));
+ host.innerHTML=found.length?`<div class="key-list">${found.map((r,i)=>`<span class="tag">${i===0?'Search match':'Connected record'}</span><strong>${esc(r.item.name||r.item.headline||'Untitled')}</strong><span class="muted">${esc(configs[r.kind]?.title||r.kind)}</span><button class="btn small" onclick="${configs[r.kind]?`editEntry('${r.kind}','${r.item.id}')`:`setPage('locations')`}">Open</button>`).join('')}</div>`:'<p class="muted">No connected records found yet. Try a broader term.</p>';
+}
+function universeSwitcherPage(){
+ const names=universeNames();
+ document.getElementById('content').innerHTML=`<div class="magic-banner"><h2>🌌 The Multiverse</h2><p>Choose a universe to make it your active creative workspace. Shared magic systems and shared records can still connect across worlds.</p><span class="active-universe">Active: ${esc(activeUniverse)}</span></div><div class="toolbar"><button class="btn ${activeUniverse==='All universes'?'primary':''}" onclick="activateUniverse('All universes')">Show all universes</button><button class="btn primary" onclick="openCreate('universes')">＋ Create universe</button></div><div class="module-grid">${names.length?names.map(n=>`<article class="module-card"><div class="module-icon">✧</div><h3>${esc(n)}</h3><p>${esc(db.universes.find(u=>u.name===n)?.description||'A world in your archive.')}</p><button class="btn small ${activeUniverse===n?'primary':''}" onclick="activateUniverse(${esc(JSON.stringify(n))})">${activeUniverse===n?'Currently active':'Enter universe →'}</button></article>`).join(''):'<div class="empty">Create your first universe to begin exploring the multiverse.</div>'}</div>`;
+}
+function activateUniverse(name){activeUniverse=name;saveHQSettings();setPage('universeSwitcher')}
+function everythingSearchPage(){
+ document.getElementById('content').innerHTML=`<div class="card"><span class="tag">Global archive search</span><h3>Search the entire universe</h3><p>Search names, descriptions, notes, spells, artefacts, bloodlines, kingdoms and more.</p><input class="field" id="everythingQuery" placeholder="Try a character, spell, city, object or event..." oninput="runEverythingSearch()"><label class="form-field" style="margin-top:10px"><span>Search scope</span><select id="everythingScope" onchange="runEverythingSearch()"><option value="all">All universes and shared records</option>${universeNames().map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')}</select></label></div><div id="everythingResults" class="card" style="margin-top:14px"><p class="muted">Start typing to search your archive.</p></div>`;
+}
+function runEverythingSearch(){
+ const q=(document.getElementById('everythingQuery')?.value||'').trim().toLowerCase(),scope=document.getElementById('everythingScope')?.value||'all',host=document.getElementById('everythingResults');if(!host)return;if(!q){host.innerHTML='<p class="muted">Start typing to search your archive.</p>';return}
+ const results=[];Object.keys(configs).forEach(k=>(db[k]||[]).forEach(x=>{if(scope!=='all'&&x.universe&&x.universe!==scope&&!(x.universe==='Shared'))return;const hay=JSON.stringify(x).toLowerCase();if(hay.includes(q))results.push({kind:k,item:x,title:x.name||x.headline||x.headline||'Untitled',summary:x.description||x.article||x.effect||x.powers||x.history||x.notes||''})}));
+ ['maps','mapObjects'].forEach(k=>(db[k]||[]).forEach(x=>{if(JSON.stringify(x).toLowerCase().includes(q))results.push({kind:k,item:x,title:x.name||x.type,summary:x.universe||'World Atlas item'})}));
+ host.innerHTML=results.length?`<strong>${results.length} result(s)</strong>${results.slice(0,100).map(searchResultHTML).join('')}`:'<p class="muted">No matches found. Try another search term.</p>';
+}
+function searchResultHTML(r){
+ let action='';if(configs[r.kind])action=`<button class="btn small" onclick="editEntry('${r.kind}','${r.item.id}')">Open →</button>`;else if(r.kind==='maps')action=`<button class="btn small" onclick="openMapStudio('${r.item.id}')">Open map →</button>`;else action=`<button class="btn small" onclick="setPage('locations')">World Atlas →</button>`;
+ return `<div class="search-result"><div><span class="tag">${esc(configs[r.kind]?.title||r.kind)}</span><strong>${esc(r.title)}</strong><p>${esc(String(r.summary).slice(0,180))}</p></div>${action}</div>`;
 }
 function dashboard(){
  const n=counts(),total=Object.values(n).reduce((a,b)=>a+b,0);
@@ -461,33 +543,33 @@ function dashboard(){
  <div class="stats"><div class="stat"><span>♙ Characters</span><strong>${n.characters}</strong></div><div class="stat"><span>✧ Universes</span><strong>${n.universes}</strong></div><div class="stat"><span>◷ Timeline entries</span><strong>${timelineItems().length}</strong></div><div class="stat"><span>🗺️ Maps</span><strong>${n.maps}</strong></div></div>
  <div class="section-head"><h2>Recently added</h2><span class="muted">${total} entries</span></div><div class="grid">${recentCards()}</div>
  <div class="section-head"><h2>Your creative workspace</h2></div><div class="grid">
- ${[['Characters','Build detailed character profiles.','characters'],['Family tree','Explore family connections.','familytree'],['World Atlas','Create maps and miniature cities.','locations'],['Timeline','Keep track of world history.','timeline']].map(x=>`<div class="card"><span class="tag">Workspace</span><h3>${x[0]}</h3><p>${x[1]}</p><button class="btn small" onclick="setPage('${x[2]}')">Open →</button></div>`).join('')}
+ ${[['Characters','Build detailed character profiles.','characters'],['Family tree','Explore family connections.','familytree'],['World Atlas','Create maps and miniature cities.','locations'],['Kingdom Builder','Design kingdoms and royal dynasties.','kingdoms'],['Magic HQ','Manage every magical system and artefact.','magicHQ'],['Everything Search','Find anything across your archive.','everythingSearch']].map(x=>`<div class="card"><span class="tag">Workspace</span><h3>${x[0]}</h3><p>${x[1]}</p><button class="btn small" onclick="setPage('${x[2]}')">Open →</button></div>`).join('')}
  </div>`;
 }
 function recentCards(){
  let all=[];Object.keys(configs).forEach(k=>db[k].forEach(x=>all.push({...x,_kind:k})));
  all.sort((a,b)=>(b.updated||b.created||0)-(a.updated||a.created||0));
  if(!all.length)return '<div class="empty">Your archive is waiting for its first entry.</div>';
- return all.slice(0,3).map(x=>`<div class="card"><span class="tag">${configs[x._kind].singular}</span><h3>${esc(x.name||'Untitled')}</h3><p>${esc(x.description||x.personality||x.date||x.type||'Added to your archive')}</p><button class="btn small" onclick="setPage('${x._kind}')">View →</button></div>`).join('');
+ return all.slice(0,3).map(x=>`<div class="card"><span class="tag">${configs[x._kind].singular}</span><h3>${esc(x.name||x.headline||'Untitled')}</h3><p>${esc(x.description||x.article||x.personality||x.date||x.type||'Added to your archive')}</p><button class="btn small" onclick="setPage('${x._kind}')">View →</button></div>`).join('');
 }
 function listPage(k){
  const c=configs[k],arr=db[k]||[];
  document.getElementById('content').innerHTML=`<div class="toolbar"><input class="field search" id="search" placeholder="Search ${c.title.toLowerCase()}..." oninput="filterCards()"><button class="btn primary" onclick="openCreate('${k}')">＋ Add ${c.singular}</button></div><div class="grid" id="cards">${arr.length?arr.map(x=>card(k,x)).join(''):'<div class="empty">Nothing here yet. Add your first entry.</div>'}</div>`;
 }
 function card(k,x){
- const title=x.name||(characterName(x.characterA)+' & '+characterName(x.characterB));
- let summary=x.description||x.personality||x.purpose||x.howMet||x.notes||x.backstory||x.date||'No description added yet.';
+ const title=x.name||x.headline||(characterName(x.characterA)+' & '+characterName(x.characterB));
+ let summary=x.description||x.personality||x.purpose||x.howMet||x.notes||x.backstory||x.article||x.effect||x.powers||x.history||x.meaning||x.date||'No description added yet.';
  if(k==='relationships')summary=characterName(x.characterA)+' and '+characterName(x.characterB)+'. '+(x.howMet||'');
  const meta=k==='characters'?[x.age&&'Age '+x.age,x.pronouns,x.universe].filter(Boolean).join(' · '):k==='relationships'?x.type:x.type||x.universe||'';
  return `<article class="card" data-search="${esc(JSON.stringify(x).toLowerCase())}"><span class="tag">${esc(meta||configs[k].singular)}</span>${x.portrait?`<img class="portrait" src="${esc(x.portrait)}" alt="">`:''}<h3>${esc(title)}</h3><p>${esc(summary).slice(0,190)}</p><div class="card-foot"><span class="muted">${esc(x.universe||x.location||'Archive entry')}</span><span><button class="btn small" onclick="editEntry('${k}','${x.id}')">Edit</button> <button class="btn small danger" onclick="deleteEntry('${k}','${x.id}')">Delete</button></span></div></article>`;
 }
 function filterCards(){const q=document.getElementById('search')?.value.toLowerCase()||'';document.querySelectorAll('#cards article').forEach(e=>e.style.display=e.dataset.search.includes(q)?'':'none')}
-function openCreate(k=page){if(!configs[k])k='characters';editing={kind:k,id:null};showForm(k,{})}
+function openCreate(k=page){if(!configs[k])k=page==='magicHQ'?'magicSystems':page==='universeSwitcher'?'universes':'characters';editing={kind:k,id:null};showForm(k,{})}
 function editEntry(k,i){const x=db[k]?.find(y=>y.id===i);if(x){editing={kind:k,id:i};showForm(k,x)}}
 function showForm(k,x){
  const c=configs[k];document.getElementById('modalTitle').textContent=(editing.id?'Edit ':'Add ')+c.singular;
  document.getElementById('formFields').innerHTML=c.fields.map(f=>{
- const [key,label,type,extra]=f,val=x[key]??'';let inp='';
+ const [key,label,type,extra]=f,val=x[key]??(key==='universe'&&activeUniverse!=='All universes'?activeUniverse:'');let inp='';
  if(type==='textarea')inp=`<textarea name="${key}" ${extra===true?'required':''}>${esc(val)}</textarea>`;
  else if(type==='character')inp=`<select name="${key}" required><option value="">Choose a character</option>${db.characters.map(ch=>`<option value="${esc(ch.id)}" ${val===ch.id?'selected':''}>${esc(ch.name)}</option>`).join('')}</select>`;
  else if(type==='multi-character'){const a=Array.isArray(val)?val:[];inp=`<select name="${key}" multiple style="min-height:110px">${db.characters.map(ch=>`<option value="${esc(ch.id)}" ${a.includes(ch.id)?'selected':''}>${esc(ch.name)}</option>`).join('')}</select><small class="muted">Use Ctrl or Command to select multiple.</small>`}
@@ -523,8 +605,9 @@ function timelineItems(){
  add('Character birth',db.characters,'birthDate','backstory');add('Character death',db.characters,'deathDate','backstory');
  add('Universe founded',db.universes,'foundedDate','description');add('Location established',db.locations,'establishedDate','history');
  add('Relationship began',db.relationships,'startDate','history');add('Relationship ended',db.relationships,'endDate','history');
- add('Group founded',db.groups,'foundedDate','history');add('Event',db.events,'date','description');add('Reference saved',db.links,'savedDate','notes');
+ add('Group founded',db.groups,'foundedDate','history');add('Event',db.events,'date','description');add('Reference saved',db.links,'savedDate','notes');add('Festival',db.festivals,'date','meaning');add('Newspaper article',db.newspapers,'date','article');add('Magical event',db.magicHistory,'date','description');add('Magical conflict',db.magicConflicts,'period','cause');
  return out.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+}
 }
 function timelinePage(){
  const es=timelineItems();
@@ -615,7 +698,7 @@ function renderMapStudio(){
  <aside class="studio-side"><h3>Object library</h3><div class="object-library">${objectTypes.map(o=>`<button class="object-choice" onclick="addMapObject('${o[0]}','${o[1]}','${o[2]}')">${o[1]} ${o[2]}</button>`).join('')}</div>
  <div class="settings-section"><button class="btn small" onclick="document.getElementById('objectUploadFile').click()">↑ Upload custom object</button><p class="studio-help">Choose an object, then drag it anywhere on the map.</p></div>
  <div class="settings-section"><h3>Selected object</h3>${chosen?`
- <label class="form-field"><span>Name / hover label</span><input class="field" value="${esc(chosen.name||'')}" onchange="updateMapObject('name',this.value)"></label>
+  <label class="form-field"><span>Name / hover label</span><input class="field" value="${esc(chosen.name||'')}" onchange="updateMapObject('name',this.value)"></label>
  <label class="form-field"><span>Size</span><input class="field" type="range" min="25" max="180" value="${chosen.width||80}" oninput="updateMapObject('width',Number(this.value))"></label>
  <label class="form-field"><span>Position X</span><input class="field" type="range" min="0" max="100" value="${chosen.x}" oninput="updateMapObject('x',Number(this.value))"></label>
  <label class="form-field"><span>Position Y</span><input class="field" type="range" min="0" max="100" value="${chosen.y}" oninput="updateMapObject('y',Number(this.value))"></label>
@@ -688,7 +771,7 @@ function backup(){
  document.getElementById('content').innerHTML=`
  <div class="section-head"><h2>Make HQ your own</h2></div><div class="card"><span class="tag">Personalisation</span><h3>Your HQ appearance</h3><p>Choose themes, colours, fonts and backgrounds. These settings belong to your account.</p><div id="settingsControls"></div></div>
  <div class="section-head"><h2>Archive tools</h2></div><div class="grid">
- <div class="card"><span class="tag">Export</span><h3>Download archive</h3><p>Save your entries, maps and map objects to a JSON backup.</p><button class="btn primary" onclick="exportData()">↓ Export backup</button></div>
+ <div class="card"><span class="tag">Export</span><h3>Download archive</h3><p>Save every worldbuilding, magic, map and archive collection to a JSON backup.</p><button class="btn primary" onclick="exportData()">↓ Export backup</button></div>
  <div class="card"><span class="tag">Import</span><h3>Restore backup</h3><p>Import a previous archive backup. This replaces current entries.</p><button class="btn" onclick="document.getElementById('importFile').click()">↑ Choose file</button></div>
  <div class="card"><span class="tag">Cloud</span><h3>Your account</h3><p>${esc(currentUser?.email||'')}</p><button class="btn" onclick="signOut()">Sign out</button></div></div>
  <div class="section-head"><h2>Archive summary</h2></div><div class="stats">${Object.entries(counts()).map(([k,v])=>`<div class="stat"><span>${configs[k]?.title||k}</span><strong>${v}</strong></div>`).join('')}</div>
